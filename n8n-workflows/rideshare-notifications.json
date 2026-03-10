@@ -1,0 +1,401 @@
+{
+  "name": "RideShare Complete Notification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "ride-notifications",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "name": "Webhook - Main Entry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 400],
+      "webhookId": "ride-notifications"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"type\"]}}",
+              "operation": "equals",
+              "value2": "VERIFICATION"
+            }
+          ]
+        }
+      },
+      "name": "Is Email Verification",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"type\"]}}",
+              "operation": "equals",
+              "value2": "SOS_ALERT"
+            }
+          ]
+        }
+      },
+      "name": "Is SOS Alert",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"type\"]}}",
+              "operation": "equals",
+              "value2": "SPONSORSHIP"
+            }
+          ]
+        }
+      },
+      "name": "Is Sponsorship Notification",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"notificationType\"]}}",
+              "operation": "equals",
+              "value2": "RIDE_CREATED"
+            }
+          ]
+        }
+      },
+      "name": "Is Ride Notification",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 800]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "={{$json[\"email\"]}}",
+        "subject": "=Verify Your Email - RideShare",
+        "emailType": "html",
+        "message": "=<h1>Welcome to RideShare!</h1><p>Please verify your email by clicking below:</p><a href=\"={{$json[\"verificationLink\"]}}\" style=\"display:inline-block;padding:10px 20px;background:#667eea;color:white;text-decoration:none;border-radius:5px;\">Verify Email</a><p>Link expires in 24 hours</p>"
+      },
+      "name": "Send Verification Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [650, 100],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "={{$json[\"alertDetails\"][\"emergencyEmails\"]}}",
+        "subject": "=🆘 EMERGENCY - SOS Alert Triggered",
+        "emailType": "html",
+        "message": "=<h1 style=\"color:red;\">🆘 EMERGENCY ALERT</h1><h3>SOS Alert Details:</h3><ul><li><strong>Ride ID:</strong> {{$json[\"alertDetails\"][\"rideID\"]}}</li><li><strong>Passenger:</strong> {{$json[\"alertDetails\"][\"passengerID\"]}}</li><li><strong>Location:</strong> {{$json[\"alertDetails\"][\"location\"]}}</li><li><strong>Coordinates:</strong> {{$json[\"alertDetails\"][\"latitude\"]}}, {{$json[\"alertDetails\"][\"longitude\"]}}</li><li><strong>Time:</strong> {{$json[\"alertDetails\"][\"timestamp\"]}}</li></ul><p><strong>Authorities have been notified.</strong></p>"
+      },
+      "name": "Send SOS Alert Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [650, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "={{$json[\"email\"]}}",
+        "subject": "={{$json[\"subject\"]}}",
+        "emailType": "html",
+        "message": "=<h2>{{$json[\"subject\"]}}</h2><p>{{$json[\"message\"]}}</p><hr><h3>Sponsorship Details:</h3><ul><li><strong>Sponsorship ID:</strong> {{$json[\"sponsorshipID\"]}}</li><li><strong>Status:</strong> {{$json[\"status\"]}}</li><li><strong>Probation Period:</strong> {{$json[\"probationPeriod\"]}}</li></ul><p>Thank you for being part of our trust network!</p>"
+      },
+      "name": "Send Sponsorship Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [650, 600],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sendTo": "={{$json[\"email\"]}}",
+        "subject": "={{$json[\"subject\"]}}",
+        "emailType": "html",
+        "message": "=<h2>{{$json[\"subject\"]}}</h2><p>{{$json[\"message\"]}}</p><hr><h3>Ride Details:</h3><ul><li><strong>Ride ID:</strong> {{$json[\"rideDetails\"][\"rideID\"]}}</li><li><strong>From:</strong> {{$json[\"rideDetails\"][\"startLocation\"]}}</li><li><strong>To:</strong> {{$json[\"rideDetails\"][\"endLocation\"]}}</li><li><strong>Departure:</strong> {{$json[\"rideDetails\"][\"departureTime\"]}}</li></ul><p>Thank you for using RideShare!</p>"
+      },
+      "name": "Send Ride Notification Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [650, 800],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Main Entry": {
+      "main": [
+        [
+          {
+            "node": "Is Email Verification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is SOS Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Sponsorship Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Ride Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Email Verification": {
+      "main": [
+        [
+          {
+            "node": "Send Verification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SOS Alert": {
+      "main": [
+        [
+          {
+            "node": "Send SOS Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Sponsorship Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Sponsorship Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Ride Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Ride Notification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "rideshare-notifications"
+}
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"notificationType\"]}}",
+              "operation": "equals",
+              "value2": "SOS_ALERT"
+            }
+          ]
+        }
+      },
+      "name": "Is SOS Alert",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 700]
+    },
+    {
+      "parameters": {
+        "authentication": "smtp",
+        "fromEmail": "noreply@rideshare.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "={{$json[\"subject\"]}}",
+        "text": "={{$json[\"message\"]}}",
+        "options": {}
+      },
+      "name": "Send Ride Created Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [650, 200],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "Gmail SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "smtp",
+        "fromEmail": "noreply@rideshare.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "={{$json[\"subject\"]}}",
+        "text": "={{$json[\"message\"]}}",
+        "options": {}
+      },
+      "name": "Send Ride Booked Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "authentication": "smtp",
+        "fromEmail": "emergency@rideshare.com",
+        "toEmail": "emergency@authorities.com",
+        "subject": "🆘 EMERGENCY - SOS Alert",
+        "text": "Emergency SOS Alert triggered!\n\nRide ID: {{$json[\"alertDetails\"][\"rideID\"]}}\nPassenger: {{$json[\"alertDetails\"][\"passengerID\"]}}\nLocation: {{$json[\"alertDetails\"][\"location\"]}}\nCoordinates: {{$json[\"alertDetails\"][\"latitude\"]}}, {{$json[\"alertDetails\"][\"longitude\"]}}\nTime: {{$json[\"alertDetails\"][\"timestamp\"]}}",
+        "options": {}
+      },
+      "name": "Send SOS Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [650, 600],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "Gmail SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.twilio.com/2010-04-01/Accounts/YOUR_ACCOUNT_SID/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "+1234567890"
+            },
+            {
+              "name": "From",
+              "value": "+0987654321"
+            },
+            {
+              "name": "Body",
+              "value": "🆘 EMERGENCY! SOS Alert - Ride: {{$json[\"alertDetails\"][\"rideID\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "Send SMS Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 700]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Is Ride Created",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Ride Booked",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is SOS Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Ride Created": {
+      "main": [
+        [
+          {
+            "node": "Send Ride Created Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Ride Booked": {
+      "main": [
+        [
+          {
+            "node": "Send Ride Booked Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SOS Alert": {
+      "main": [
+        [
+          {
+            "node": "Send SOS Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send SMS Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "updatedAt": "2026-02-08T00:00:00.000Z"
+}

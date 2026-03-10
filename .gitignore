@@ -1,0 +1,37 @@
+node_modules/
+.env
+.env.local
+dist/
+build/
+*.log
+
+# Hyperledger Fabric
+network/organizations/
+network/channel-artifacts/
+network/system-genesis-block/
+wallet/
+*.tar.gz
+*.exe
+*.tgz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keys
+*.pem
+*.key
+private/
+
+# Markdown docs (except README)
+CURRENT_STATUS.md
+FEATURES_IMPLEMENTATION.md
+PROJECT_COMPARISON.md
+REFERRAL_SYSTEM_GUIDE.md
+docs/

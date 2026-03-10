@@ -1,0 +1,32 @@
+version: '3.7'
+
+networks:
+  rideshare:
+    name: fabric_rideshare
+
+services:
+  couchdb0:
+    container_name: couchdb0
+    image: couchdb:3.3.2
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "5984:5984"
+    networks:
+      - rideshare
+
+  couchdb1:
+    container_name: couchdb1
+    image: couchdb:3.3.2
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    ports:
+      - "7984:5984"
+    networks:
+      - rideshare

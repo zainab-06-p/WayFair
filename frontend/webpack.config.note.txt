@@ -1,0 +1,5 @@
+# Add crypto-browserify polyfill
+npm install --save-dev crypto-browserify stream-browserify
+
+# Create webpack config override
+# (Already handled in package.json with react-scripts v5)
