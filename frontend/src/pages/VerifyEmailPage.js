@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
@@ -52,13 +52,13 @@ const VerifyEmailPage = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
       <Box sx={{ position: 'fixed', top: '10%', left: '5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'fixed', bottom: '15%', right: '5%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
         style={{ width: '100%', maxWidth: 440, zIndex: 1, padding: '0 16px' }}>
-        <Box sx={{ background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '20px', p: { xs: 3, sm: 5 }, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <Box sx={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '20px', p: { xs: 3, sm: 5 }, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #06B6D4, #8B5CF6, #EC4899)' }} />
 
           {verified ? (
@@ -67,10 +67,10 @@ const VerifyEmailPage = () => {
               <Typography variant="h4" gutterBottom sx={{ fontWeight: 900, fontFamily: '"Plus Jakarta Sans", sans-serif', background: 'linear-gradient(135deg, #34D399, #06B6D4)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Email Verified!
               </Typography>
-              <Typography variant="body1" sx={{ color: '#94A3B8', mb: 1 }}>
+              <Typography variant="body1" sx={{ color: '#475569', mb: 1 }}>
                 Your email has been verified successfully. You can now use the application.
               </Typography>
-              <Typography variant="body2" sx={{ color: '#64748B' }}>Redirecting to login?</Typography>
+              <Typography variant="body2" sx={{ color: '#334155' }}>Redirecting to login?</Typography>
             </>
           ) : (
             <>
@@ -78,7 +78,7 @@ const VerifyEmailPage = () => {
                 {`\u2709\uFE0F`} Verify Email
               </Typography>
 
-              <Typography variant="body1" sx={{ color: '#94A3B8', mt: 2, mb: 3 }}>
+              <Typography variant="body1" sx={{ color: '#475569', mt: 2, mb: 3 }}>
                 Click the button below to verify your email address and activate your account.
               </Typography>
 
@@ -93,7 +93,7 @@ const VerifyEmailPage = () => {
                 {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Verify Email'}
               </Button>
 
-              <Button fullWidth variant="text" onClick={() => navigate('/login')} sx={{ color: '#64748B', '&:hover': { color: '#94A3B8' } }}>
+              <Button fullWidth variant="text" onClick={() => navigate('/login')} sx={{ color: '#334155', '&:hover': { color: '#475569' } }}>
                 Back to Login
               </Button>
             </>

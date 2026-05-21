@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -127,7 +127,7 @@ const ChatPage = () => {
           )}
 
           {/* Bubble */}
-          <Box sx={{ maxWidth: '65%', background: isOwn ? 'linear-gradient(135deg, rgba(6,182,212,0.25), rgba(139,92,246,0.2))' : 'rgba(15,23,42,0.9)', border: isOwn ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(139,92,246,0.2)', borderRadius: isOwn ? '16px 4px 16px 16px' : '4px 16px 16px 16px', px: 1.5, py: 0.8, boxShadow: isOwn ? '0 2px 8px rgba(6,182,212,0.15)' : '0 2px 8px rgba(0,0,0,0.2)', position: 'relative' }}>
+          <Box sx={{ maxWidth: '65%', background: isOwn ? 'linear-gradient(135deg, rgba(6,182,212,0.25), rgba(139,92,246,0.2))' : 'rgba(255,255,255,0.96)', border: isOwn ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(139,92,246,0.2)', borderRadius: isOwn ? '16px 4px 16px 16px' : '4px 16px 16px 16px', px: 1.5, py: 0.8, boxShadow: isOwn ? '0 2px 8px rgba(6,182,212,0.15)' : '0 2px 8px rgba(0,0,0,0.2)', position: 'relative' }}>
             {/* Sender role for others */}
             {showSender && !isOwn && (
               <Typography variant="caption" sx={{ color: '#06B6D4', fontWeight: 700, display: 'block', mb: 0.2, lineHeight: 1.2 }}>
@@ -136,7 +136,7 @@ const ChatPage = () => {
             )}
 
             {/* Message text */}
-            <Typography variant="body2" sx={{ wordBreak: 'break-word', lineHeight: 1.4, color: '#F1F5F9', whiteSpace: 'pre-wrap' }}>
+            <Typography variant="body2" sx={{ wordBreak: 'break-word', lineHeight: 1.4, color: 'text.primary', whiteSpace: 'pre-wrap' }}>
               {msg.message}
             </Typography>
 
@@ -151,9 +151,9 @@ const ChatPage = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 4, pb: 4 }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 4, pb: 4 }}>
       <Container maxWidth="md" sx={{ width: '100%' }}>
-      <Box sx={{ height: '82vh', display: 'flex', flexDirection: 'column', background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', overflow: 'hidden' }}>
+      <Box sx={{ height: '82vh', display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', overflow: 'hidden' }}>
 
         {/* -- Header --------------------------------------------- */}
         <Box
@@ -181,11 +181,11 @@ const ChatPage = () => {
         </Box>
 
         {/* -- Messages Area -------------------------------------- */}
-        <Box sx={{ flexGrow: 1, overflow: 'auto', py: 1, background: 'rgba(3,7,18,0.6)', '&::-webkit-scrollbar': { width: 4 }, '&::-webkit-scrollbar-thumb': { background: 'rgba(139,92,246,0.3)', borderRadius: 2 } }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto', py: 1, background: 'rgba(248,250,252,0.9)', '&::-webkit-scrollbar': { width: 4 }, '&::-webkit-scrollbar-thumb': { background: 'rgba(139,92,246,0.3)', borderRadius: 2 } }}>
           {messages.length === 0 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
               <Box sx={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '12px', px: 2, py: 0.8 }}>
-                <Typography variant="caption" sx={{ color: '#94A3B8' }}>
+                <Typography variant="caption" sx={{ color: '#475569' }}>
                   {`\u{1F512}`} Visible to ride participants only
                 </Typography>
               </Box>
@@ -195,7 +195,7 @@ const ChatPage = () => {
           {isTyping && (
             <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 0.8, px: 2, mt: 0.5 }}>
               <Avatar sx={{ width: 26, height: 26, background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', fontSize: '0.6rem' }}>{`\u{1F464}`}</Avatar>
-              <Box sx={{ background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '4px 14px 14px 14px', px: 1.2, py: 0.7 }}>
+              <Box sx={{ background: 'rgba(255,255,255,0.96)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '4px 14px 14px 14px', px: 1.2, py: 0.7 }}>
                 <Box sx={{ display: 'flex', gap: 0.4, alignItems: 'center' }}>
                   {[0, 180, 360].map((delay) => (
                     <Box key={delay} sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#8B5CF6',
@@ -216,11 +216,11 @@ const ChatPage = () => {
         </Box>
 
         {/* -- Input Bar ------------------------------------------- */}
-        <Box sx={{ background: 'rgba(15,23,42,0.9)', px: 1.5, py: 0.8, display: 'flex', alignItems: 'flex-end', gap: 1, flexShrink: 0, borderTop: '1px solid rgba(139,92,246,0.2)' }}>
+        <Box sx={{ background: 'rgba(255,255,255,0.96)', px: 1.5, py: 0.8, display: 'flex', alignItems: 'flex-end', gap: 1, flexShrink: 0, borderTop: '1px solid rgba(139,92,246,0.2)' }}>
           <TextField fullWidth multiline maxRows={4} placeholder="Type a message..." value={newMessage}
             onChange={(e) => { setNewMessage(e.target.value); handleTypingIndicator(); }}
             onKeyDown={handleKeyDown} disabled={!connected} variant="outlined" size="small"
-            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', background: 'rgba(15,23,42,0.8)', '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' }, '&.Mui-focused fieldset': { borderColor: '#06B6D4' } }, '& textarea': { color: '#F1F5F9' }, '& textarea::placeholder': { color: '#64748B' } }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', background: 'rgba(255,255,255,0.92)', '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' }, '&.Mui-focused fieldset': { borderColor: '#06B6D4' } }, '& textarea': { color: 'text.primary' }, '& textarea::placeholder': { color: '#334155' } }}
           />
           <Tooltip title={connected ? 'Send' : 'Disconnected'}>
             <span>

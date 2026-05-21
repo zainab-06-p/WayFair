@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container, Box, Typography, Paper, Grid, Chip, Button, CircularProgress,
@@ -36,7 +36,7 @@ const getStatusStyle = (status) => {
     scheduled: { bg: 'rgba(56,189,248,0.15)', color: '#38BDF8', border: 'rgba(56,189,248,0.3)' },
     cancelled: { bg: 'rgba(239,68,68,0.15)', color: '#F87171', border: 'rgba(239,68,68,0.3)' },
   };
-  const s = map[(status||'').toLowerCase()] || { bg: 'rgba(100,116,139,0.15)', color: '#94A3B8', border: 'rgba(100,116,139,0.3)' };
+  const s = map[(status||'').toLowerCase()] || { bg: 'rgba(100,116,139,0.15)', color: '#475569', border: 'rgba(100,116,139,0.3)' };
   return { background: s.bg, color: s.color, border: `1px solid ${s.border}`, fontWeight: 700 };
 };
 
@@ -145,15 +145,15 @@ const RideDetailsPage = () => {
   };
 
   if (loading) return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <CircularProgress sx={{ color: '#06B6D4' }} />
     </Box>
   );
 
   if (!ride) return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 4, textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ color: '#F1F5F9', mb: 2 }}>Ride not found</Typography>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 4, textAlign: 'center' }}>
+        <Typography variant="h5" sx={{ color: 'text.primary', mb: 2 }}>Ride not found</Typography>
         <Button variant="contained" onClick={() => navigate('/passenger/search')} sx={{ borderRadius: '12px', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)' }}>
           Back to Search
         </Button>
@@ -167,25 +167,25 @@ const RideDetailsPage = () => {
   const xp        = driverRating.count * 10;
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', position: 'relative', overflow: 'hidden' }}>
       <Box sx={{ position: 'fixed', top: '10%', left: '5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'fixed', bottom: '15%', right: '5%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
     <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
       <Box sx={{ pt: 4, pb: 4 }}>
         <Button startIcon={<ArrowBack />} onClick={() => navigate(-1)}
-          sx={{ mb: 2, color: '#94A3B8', '&:hover': { color: '#06B6D4' } }}>Back</Button>
+          sx={{ mb: 2, color: '#475569', '&:hover': { color: '#06B6D4' } }}>Back</Button>
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', p: 4, mb: 3, position: 'relative', overflow: 'hidden' }}>
+          <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', p: 4, mb: 3, position: 'relative', overflow: 'hidden' }}>
             <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #06B6D4, #8B5CF6, #EC4899)' }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: '"Plus Jakarta Sans", sans-serif', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                ?? Ride Details
+               Ride Details
               </Typography>
               <Chip label={(ride.status || 'created').toUpperCase()} size="small" sx={getStatusStyle(ride.status)} />
             </Box>
-            <Typography variant="body2" sx={{ color: '#64748B', mt: 1, fontFamily: 'monospace' }}>ID: {rideID}</Typography>
+            <Typography variant="body2" sx={{ color: '#334155', mt: 1, fontFamily: 'monospace' }}>ID: {rideID}</Typography>
           </Box>
         </motion.div>
 
@@ -193,17 +193,17 @@ const RideDetailsPage = () => {
           {/* Route */}
           <Grid item xs={12} md={6}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '14px', p: 3, height: '100%' }}>
-                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
-                  ?? Route
+              <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '14px', p: 3, height: '100%' }}>
+                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
+                   Route
                 </Typography>
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', textTransform: 'uppercase', letterSpacing: 1 }}>FROM</Typography>
+                  <Typography variant="caption" sx={{ color: '#334155', textTransform: 'uppercase', letterSpacing: 1 }}>FROM</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 500, color: '#34D399', mt: 0.5 }}>{ride.startAddress}</Typography>
                 </Box>
                 <Box sx={{ width: 2, height: 20, background: 'rgba(139,92,246,0.4)', ml: 0.5, mb: 1 }} />
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#64748B', textTransform: 'uppercase', letterSpacing: 1 }}>TO</Typography>
+                  <Typography variant="caption" sx={{ color: '#334155', textTransform: 'uppercase', letterSpacing: 1 }}>TO</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 500, color: '#F87171', mt: 0.5 }}>{ride.endAddress}</Typography>
                 </Box>
               </Box>
@@ -213,22 +213,22 @@ const RideDetailsPage = () => {
           {/* Schedule */}
           <Grid item xs={12} md={6}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-              <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '14px', p: 3, height: '100%' }}>
-                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
-                  ?? Schedule & Pricing
+              <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '14px', p: 3, height: '100%' }}>
+                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
+                   Schedule & Pricing
                 </Typography>
                 <Box sx={{ mb: 1.5 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B' }}>Departure</Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 500, color: '#F1F5F9' }}>
+                  <Typography variant="caption" sx={{ color: '#334155' }}>Departure</Typography>
+                  <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
                     {ride.departureTime ? new Date(ride.departureTime).toLocaleString() : 'TBD'}
                   </Typography>
                 </Box>
                 <Box sx={{ mb: 1.5 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B' }}>Available Seats</Typography>
+                  <Typography variant="caption" sx={{ color: '#334155' }}>Available Seats</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 500, color: '#8B5CF6' }}>{ride.availableSeats}</Typography>
                 </Box>
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#64748B' }}>Price / Seat</Typography>
+                  <Typography variant="caption" sx={{ color: '#334155' }}>Price / Seat</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 700, color: '#06B6D4', fontSize: '1.1rem' }}>
                     ?{ride.pricePerSeat}
                   </Typography>
@@ -334,18 +334,18 @@ const RideDetailsPage = () => {
 
       {/* -- Booking Dialog ------------------------------------------- */}
       <Dialog open={bookDialog} onClose={() => setBookDialog(false)} maxWidth="sm" fullWidth
-        PaperProps={{ sx: { background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px' } }}>
+        PaperProps={{ sx: { background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px' } }}>
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography sx={{ fontSize: '1.2rem' }}>{`\u{1F697}`}</Typography>
-            <Typography variant="h6" sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>Confirm Booking</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>Confirm Booking</Typography>
           </Box>
         </DialogTitle>
         <DialogContent>
           <Box sx={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '10px', p: 2, mb: 2 }}>
-            <Typography variant="body2" sx={{ color: '#64748B' }}>Route</Typography>
-            <Typography sx={{ color: '#F1F5F9' }}>{ride.startAddress} {`\u2192`} {ride.endAddress}</Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: '#94A3B8' }}>
+            <Typography variant="body2" sx={{ color: '#334155' }}>Route</Typography>
+            <Typography sx={{ color: 'text.primary' }}>{ride.startAddress} {`\u2192`} {ride.endAddress}</Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: '#475569' }}>
               {ride.availableSeats} seats available {`\u00B7`} {`\u20B9`}{ride.pricePerSeat}/seat
             </Typography>
           </Box>
@@ -353,20 +353,20 @@ const RideDetailsPage = () => {
             inputProps={{ min: 1, max: ride.availableSeats }}
             value={seatsToBook}
             onChange={e => setSeatsToBook(Math.min(ride.availableSeats, Math.max(1, parseInt(e.target.value)||1)))}
-            sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' } }, '& .MuiInputLabel-root': { color: '#64748B' }, '& input': { color: '#F1F5F9' } }} />
+            sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' } }, '& .MuiInputLabel-root': { color: '#334155' }, '& input': { color: 'text.primary' } }} />
           <Typography variant="h6" sx={{ color: '#06B6D4', fontWeight: 700, mb: 2 }}>
             Total: {`\u20B9`}{seatsToBook * ride.pricePerSeat}
           </Typography>
           <FormControl>
-            <FormLabel sx={{ color: '#94A3B8' }}>Payment</FormLabel>
+            <FormLabel sx={{ color: '#475569' }}>Payment</FormLabel>
             <RadioGroup row value={payMethod} onChange={e => setPayMethod(e.target.value)}>
-              <FormControlLabel value="cash"     control={<Radio sx={{ color: '#64748B', '&.Mui-checked': { color: '#06B6D4' } }} />} label={<Typography sx={{ color: '#94A3B8' }}>Cash</Typography>} />
-              <FormControlLabel value="upi"      control={<Radio sx={{ color: '#64748B', '&.Mui-checked': { color: '#06B6D4' } }} />} label={<Typography sx={{ color: '#94A3B8' }}>UPI</Typography>} />
-              <FormControlLabel value="ethereum" control={<Radio sx={{ color: '#64748B', '&.Mui-checked': { color: '#06B6D4' } }} />} label={<Typography sx={{ color: '#94A3B8' }}>MetaMask ETH</Typography>} />
+              <FormControlLabel value="cash"     control={<Radio sx={{ color: '#334155', '&.Mui-checked': { color: '#06B6D4' } }} />} label={<Typography sx={{ color: '#475569' }}>Cash</Typography>} />
+              <FormControlLabel value="upi"      control={<Radio sx={{ color: '#334155', '&.Mui-checked': { color: '#06B6D4' } }} />} label={<Typography sx={{ color: '#475569' }}>UPI</Typography>} />
+              <FormControlLabel value="ethereum" control={<Radio sx={{ color: '#334155', '&.Mui-checked': { color: '#06B6D4' } }} />} label={<Typography sx={{ color: '#475569' }}>MetaMask ETH</Typography>} />
             </RadioGroup>
           </FormControl>
           {payMethod === 'upi' && (
-            <TextField fullWidth label="Driver's UPI ID" size="small" sx={{ mt: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' } }, '& .MuiInputLabel-root': { color: '#64748B' }, '& input': { color: '#F1F5F9' } }}
+            <TextField fullWidth label="Driver's UPI ID" size="small" sx={{ mt: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' } }, '& .MuiInputLabel-root': { color: '#334155' }, '& input': { color: 'text.primary' } }}
               value={upiId} onChange={e => setUpiId(e.target.value)}
               InputProps={{ endAdornment: (
                 <InputAdornment position="end">
@@ -384,7 +384,7 @@ const RideDetailsPage = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ borderTop: '1px solid rgba(139,92,246,0.15)' }}>
-          <Button onClick={() => setBookDialog(false)} disabled={bookingInProg} sx={{ color: '#94A3B8' }}>Cancel</Button>
+          <Button onClick={() => setBookDialog(false)} disabled={bookingInProg} sx={{ color: '#475569' }}>Cancel</Button>
           <Button variant="contained" onClick={handleBook} disabled={bookingInProg || (payMethod==='upi' && !upiId)}
             sx={{ borderRadius: '10px', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', fontWeight: 700 }}>
             {bookingInProg ? <CircularProgress size={20} color="inherit" /> : 'Confirm'}

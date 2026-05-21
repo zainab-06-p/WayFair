@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -142,14 +142,14 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <CircularProgress sx={{ color: '#06B6D4' }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', position: 'relative', overflow: 'hidden' }}>
       <Box sx={{ position: 'fixed', top: '10%', left: '5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'fixed', bottom: '10%', right: '5%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
@@ -157,13 +157,13 @@ const AdminDashboard = () => {
       <Box sx={{ pt: 4, pb: 4 }}>
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', p: 3, mb: 4, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', p: 3, mb: 4, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #06B6D4, #8B5CF6, #EC4899)' }} />
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: '"Plus Jakarta Sans", sans-serif', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                ?? Admin Dashboard
+                 Admin Dashboard
               </Typography>
-              <Typography variant="body1" sx={{ color: '#94A3B8', mt: 0.5 }}>
+              <Typography variant="body1" sx={{ color: '#475569', mt: 0.5 }}>
                 Manage users, review documents, and monitor platform activity
               </Typography>
             </Box>
@@ -185,10 +185,10 @@ const AdminDashboard = () => {
           ].map(({ emoji, label, value, color }, i) => (
             <Grid item xs={12} md={2.4} key={label}>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} whileHover={{ y: -4 }}>
-                <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: `1px solid ${color}33`, borderRadius: '14px', p: 2.5, textAlign: 'center' }}>
+                <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: `1px solid ${color}33`, borderRadius: '14px', p: 2.5, textAlign: 'center' }}>
                   <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>{emoji}</Typography>
                   <Typography variant="h3" sx={{ fontWeight: 900, fontFamily: '"Plus Jakarta Sans", sans-serif', color }}>{value}</Typography>
-                  <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>{label}</Typography>
+                  <Typography variant="body2" sx={{ color: '#334155', fontWeight: 600 }}>{label}</Typography>
                 </Box>
               </motion.div>
             </Grid>
@@ -196,36 +196,36 @@ const AdminDashboard = () => {
         </Grid>
 
         {/* Users Table */}
-        <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', overflow: 'hidden' }}>
+        <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', overflow: 'hidden' }}>
           <TableContainer>
             <Table>
               <TableHead sx={{ background: 'rgba(139,92,246,0.1)' }}>
                 <TableRow>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>User</TableCell>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Email</TableCell>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Age</TableCell>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Role</TableCell>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Status</TableCell>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Registration</TableCell>
-                  <TableCell sx={{ color: '#94A3B8', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Actions</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>User</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Email</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Age</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Role</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Status</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Registration</TableCell>
+                  <TableCell sx={{ color: '#475569', fontWeight: 700, borderColor: 'rgba(139,92,246,0.2)' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ borderColor: 'rgba(139,92,246,0.1)', color: '#64748B' }}>
+                    <TableCell colSpan={7} align="center" sx={{ borderColor: 'rgba(139,92,246,0.1)', color: '#334155' }}>
                       No users found
                     </TableCell>
                   </TableRow>
                 ) : (
                   users.map((user) => (
-                    <TableRow key={user.userID} sx={{ '& td': { borderColor: 'rgba(139,92,246,0.1)', color: '#94A3B8' }, '&:hover': { background: 'rgba(139,92,246,0.05)' } }}>
+                    <TableRow key={user.userID} sx={{ '& td': { borderColor: 'rgba(139,92,246,0.1)', color: '#475569' }, '&:hover': { background: 'rgba(139,92,246,0.05)' } }}>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Avatar sx={{ background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', width: 34, height: 34, fontSize: '0.9rem' }}>
                             {user.name?.charAt(0).toUpperCase()}
                           </Avatar>
-                          <Typography variant="body2" sx={{ color: '#F1F5F9' }}>{user.name || 'N/A'}</Typography>
+                          <Typography variant="body2" sx={{ color: 'text.primary' }}>{user.name || 'N/A'}</Typography>
                         </Box>
                       </TableCell>
                       <TableCell>
@@ -271,8 +271,8 @@ const AdminDashboard = () => {
 
         {/* View Documents Dialog */}
         <Dialog open={openDocsDialog} onClose={() => setOpenDocsDialog(false)} maxWidth="md" fullWidth
-          PaperProps={{ sx: { background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px' } }}>
-          <DialogTitle sx={{ color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700 }}>
+          PaperProps={{ sx: { background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px' } }}>
+          <DialogTitle sx={{ color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700 }}>
             User Documents: {selectedUser?.name}
           </DialogTitle>
           <DialogContent>
@@ -338,7 +338,7 @@ const AdminDashboard = () => {
 
                   {selectedUser.ipfsHash && (
                     <Grid item xs={12}>
-                      <Typography variant="subtitle2" gutterBottom sx={{ color: '#94A3B8' }}>Full Profile IPFS Hash:</Typography>
+                      <Typography variant="subtitle2" gutterBottom sx={{ color: '#475569' }}>Full Profile IPFS Hash:</Typography>
                       <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all', background: 'rgba(139,92,246,0.1)', color: '#8B5CF6', p: 1, borderRadius: '8px' }}>
                         {selectedUser.ipfsHash}
                       </Typography>
@@ -360,14 +360,14 @@ const AdminDashboard = () => {
             )}
           </DialogContent>
           <DialogActions sx={{ borderTop: '1px solid rgba(139,92,246,0.15)' }}>
-            <Button onClick={() => setOpenDocsDialog(false)} sx={{ color: '#94A3B8' }}>Close</Button>
+            <Button onClick={() => setOpenDocsDialog(false)} sx={{ color: '#475569' }}>Close</Button>
           </DialogActions>
         </Dialog>
 
         {/* Block/Unblock User Dialog */}
         <Dialog open={openBlockDialog} onClose={() => setOpenBlockDialog(false)}
-          PaperProps={{ sx: { background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px' } }}>
-          <DialogTitle sx={{ color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700 }}>
+          PaperProps={{ sx: { background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '16px' } }}>
+          <DialogTitle sx={{ color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700 }}>
             {selectedUser?.isBlocked ? 'Unblock User' : 'Block User'}
           </DialogTitle>
           <DialogContent>
@@ -378,11 +378,11 @@ const AdminDashboard = () => {
                 : 'This will prevent the user from accessing the application.'}
             </Alert>
             <TextField fullWidth multiline rows={3} label="Reason (optional)" value={blockReason} onChange={(e) => setBlockReason(e.target.value)} placeholder="Enter reason for blocking/unblocking"
-              sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' } }, '& .MuiInputLabel-root': { color: '#64748B' }, '& textarea': { color: '#F1F5F9' } }}
+              sx={{ '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' } }, '& .MuiInputLabel-root': { color: '#334155' }, '& textarea': { color: 'text.primary' } }}
             />
           </DialogContent>
           <DialogActions sx={{ borderTop: '1px solid rgba(139,92,246,0.15)' }}>
-            <Button onClick={() => setOpenBlockDialog(false)} sx={{ color: '#94A3B8' }}>Cancel</Button>
+            <Button onClick={() => setOpenBlockDialog(false)} sx={{ color: '#475569' }}>Cancel</Button>
             <Button variant="contained" onClick={confirmBlockUser}
               sx={{ borderRadius: '10px', background: selectedUser?.isBlocked ? 'linear-gradient(135deg, #34D399, #059669)' : 'linear-gradient(135deg, #F87171, #DC2626)', fontWeight: 700 }}>
               {selectedUser?.isBlocked ? 'Unblock' : 'Block'}
