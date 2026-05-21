@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Box, Button, Typography, Alert, CircularProgress,
@@ -15,7 +15,7 @@ const ADMIN_WALLET_ADDRESS = '0x7613787893518461Bc6C007ccd97A5F7F877E2C4';
 // Shared styled glassmorphism input
 const GlassInput = ({ label, type = 'text', value, onChange, name, required, disabled }) => (
   <Box sx={{ mb: 2 }}>
-    <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.72rem' }}>
+    <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.72rem' }}>
       {label}
     </Typography>
     <Box
@@ -28,10 +28,10 @@ const GlassInput = ({ label, type = 'text', value, onChange, name, required, dis
       disabled={disabled}
       sx={{
         width: '100%', px: 2, py: 1.5,
-        background: 'rgba(15,23,42,0.6)',
+        background: 'rgba(255,255,255,0.82)',
         border: '1px solid rgba(139,92,246,0.25)',
         borderRadius: '12px',
-        color: '#F1F5F9',
+        color: 'text.primary',
         fontSize: '0.95rem',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         outline: 'none',
@@ -117,7 +117,7 @@ const LoginPage = () => {
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: '#030712',
+      background: '#F8FAFC',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -147,30 +147,30 @@ const LoginPage = () => {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 0 30px rgba(6,182,212,0.4)',
             fontSize: '1.8rem',
-          }}>{`\u{1F697}`}</Box>
+          }}>🚗</Box>
           <Typography variant="h4" sx={{
             fontWeight: 900, letterSpacing: '-0.03em',
             background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
           }}>WayFair</Typography>
-          <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
-            {isAdminMode ? 'Admin Panel Access' : 'Welcome back � sign in to continue'}
+          <Typography variant="body2" sx={{ color: '#475569', mt: 0.5 }}>
+            {isAdminMode ? 'Admin Panel Access' : 'Welcome back — sign in to continue'}
           </Typography>
         </Box>
 
         {/* Card */}
         <Box sx={{
-          background: 'rgba(15,23,42,0.8)',
+          background: '#FFFFFF',
           backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(139,92,246,0.25)',
+          border: '1px solid rgba(139,92,246,0.18)',
           borderRadius: '24px',
           p: { xs: 3, md: 4 },
-          boxShadow: '0 20px 80px rgba(0,0,0,0.5)',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
         }}>
           {/* Admin toggle */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
               {isAdminMode ? 'Admin Sign In' : 'Sign In'}
             </Typography>
             <FormControlLabel
@@ -187,32 +187,32 @@ const LoginPage = () => {
               }
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <AdminPanelSettings sx={{ fontSize: 16, color: isAdminMode ? '#A78BFA' : '#64748B' }} />
-                  <Typography variant="caption" sx={{ color: isAdminMode ? '#A78BFA' : '#64748B', fontWeight: 600 }}>Admin</Typography>
+                  <AdminPanelSettings sx={{ fontSize: 16, color: isAdminMode ? '#A78BFA' : '#334155' }} />
+                  <Typography variant="caption" sx={{ color: isAdminMode ? '#A78BFA' : '#334155', fontWeight: 600 }}>Admin</Typography>
                 </Box>
               }
             />
           </Box>
 
           {error && (
-            <Alert severity="error" sx={{ mb: 2.5, borderRadius: '12px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#FCA5A5' }}>
+            <Alert severity="error" sx={{ mb: 2.5, borderRadius: '12px' }}>
               {error}
             </Alert>
           )}
           {walletError && (
-            <Alert severity="error" sx={{ mb: 2.5, borderRadius: '12px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: '#FCA5A5' }}>
+            <Alert severity="error" sx={{ mb: 2.5, borderRadius: '12px' }}>
               {walletError}
             </Alert>
           )}
           {!isMetaMaskInstalled && (
-            <Alert severity="warning" sx={{ mb: 2.5, borderRadius: '12px', background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', color: '#FDE68A' }}>
+            <Alert severity="warning" sx={{ mb: 2.5, borderRadius: '12px' }}>
               MetaMask not installed. Install it to use wallet auth.
             </Alert>
           )}
 
           {isAdminMode ? (
             <>
-              <Alert severity="info" sx={{ mb: 3, borderRadius: '12px', background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)', color: '#7DD3FC' }}>
+              <Alert severity="info" sx={{ mb: 3, borderRadius: '12px' }}>
                 Requires authorized MetaMask wallet:<br />
                 <Typography variant="caption" sx={{ fontFamily: 'monospace', wordBreak: 'break-all', fontSize: '0.7rem' }}>
                   {ADMIN_WALLET_ADDRESS}
@@ -269,10 +269,10 @@ const LoginPage = () => {
                 mb: 2.5, p: 2.5, borderRadius: '12px',
                 background: 'rgba(6,182,212,0.05)', border: '1px solid rgba(6,182,212,0.15)',
               }}>
-                <Typography variant="caption" sx={{ color: '#38BDF8', fontWeight: 600, display: 'block', mb: 1 }}>
-                  {`\u{1F511}`} Stored Keys Authentication
+                <Typography variant="caption" sx={{ color: '#0891B2', fontWeight: 600, display: 'block', mb: 1 }}>
+                  🔑 Stored Keys Authentication
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#64748B', lineHeight: 1.7, display: 'block' }}>
+                <Typography variant="caption" sx={{ color: '#475569', lineHeight: 1.7, display: 'block' }}>
                   Your private key stored locally signs a challenge. No identity revealed.
                 </Typography>
               </Box>
@@ -285,9 +285,9 @@ const LoginPage = () => {
                   startIcon={loading ? null : <LockOutlined />}
                   sx={{
                     py: 1.6, borderRadius: '14px', fontWeight: 600, fontSize: '0.95rem',
-                    borderColor: 'rgba(6,182,212,0.4)', color: '#38BDF8',
-                    background: 'rgba(6,182,212,0.05)',
-                    '&:hover': { borderColor: '#06B6D4', background: 'rgba(6,182,212,0.12)', boxShadow: '0 0 20px rgba(6,182,212,0.2)' },
+                    borderColor: 'rgba(6,182,212,0.4)', color: '#0891B2',
+                    background: 'rgba(6,182,212,0.04)',
+                    '&:hover': { borderColor: '#06B6D4', background: 'rgba(6,182,212,0.1)', boxShadow: '0 0 20px rgba(6,182,212,0.15)' },
                   }}
                 >
                   {loading ? <CircularProgress size={22} sx={{ color: '#06B6D4' }} /> : 'Sign In with Stored Keys'}
@@ -297,7 +297,7 @@ const LoginPage = () => {
           )}
 
           <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid rgba(139,92,246,0.15)', textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: '#64748B' }}>
+            <Typography variant="body2" sx={{ color: '#334155' }}>
               Don't have an account?{' '}
               <Box
                 component={RouterLink}

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box, Avatar, Tooltip, IconButton, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from '@mui/material';
 import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
@@ -14,7 +14,7 @@ const NavLink = ({ to, children, onClick }) => {
       to={to}
       onClick={onClick}
       sx={{
-        color: isActive ? '#06B6D4' : 'rgba(241,245,249,0.8)',
+        color: isActive ? '#06B6D4' : '#334155',
         fontWeight: isActive ? 700 : 500,
         fontSize: '0.9rem',
         borderRadius: '8px',
@@ -83,12 +83,12 @@ const Navbar = () => {
         elevation={0}
         sx={{
           background: scrolled
-            ? 'rgba(3, 7, 18, 0.95)'
-            : 'rgba(3, 7, 18, 0.7)',
+            ? 'rgba(255, 255, 255, 0.97)'
+            : 'rgba(255, 255, 255, 0.92)',
           backdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(139, 92, 246, 0.25)',
-          transition: 'background 0.3s ease',
-          boxShadow: scrolled ? '0 8px 40px rgba(0,0,0,0.6)' : 'none',
+          borderBottom: '1px solid rgba(139, 92, 246, 0.15)',
+          transition: 'all 0.3s ease',
+          boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.08)' : '0 1px 8px rgba(0,0,0,0.04)',
         }}
       >
         <Toolbar sx={{ px: { xs: 2, md: 4 }, minHeight: { xs: 64, md: 70 } }}>
@@ -107,17 +107,13 @@ const Navbar = () => {
           >
             <Box
               sx={{
-                width: 36,
-                height: 36,
-                borderRadius: '10px',
+                width: 36, height: 36, borderRadius: '10px',
                 background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 20px rgba(6,182,212,0.4)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 0 16px rgba(6,182,212,0.35)',
               }}
             >
-              <Typography sx={{ fontSize: '18px', lineHeight: 1 }}>{`\u{1F697}`}</Typography>
+              <Typography sx={{ fontSize: '18px', lineHeight: 1 }}>🚗</Typography>
             </Box>
             <Typography
               variant="h6"
@@ -185,7 +181,7 @@ const Navbar = () => {
                     component={RouterLink}
                     to="/login"
                     variant="text"
-                    sx={{ color: 'rgba(241,245,249,0.8)', fontWeight: 500, '&:hover': { color: '#06B6D4' } }}
+                    sx={{ color: '#334155', fontWeight: 500, '&:hover': { color: '#06B6D4' } }}
                   >
                     Sign In
                   </Button>
@@ -216,7 +212,7 @@ const Navbar = () => {
           {isMobile && (
             <IconButton
               onClick={() => setDrawerOpen(true)}
-              sx={{ color: 'rgba(241,245,249,0.9)', ml: 1 }}
+              sx={{ color: '#475569', ml: 1 }}
             >
               <MenuIcon />
             </IconButton>
@@ -232,7 +228,7 @@ const Navbar = () => {
         PaperProps={{
           sx: {
             width: 280,
-            background: 'rgba(3, 7, 18, 0.98)',
+            background: 'rgba(248, 250, 252, 0.96)',
             backdropFilter: 'blur(30px)',
             borderLeft: '1px solid rgba(139, 92, 246, 0.3)',
             p: 2,
@@ -251,7 +247,7 @@ const Navbar = () => {
           >
             WayFair
           </Typography>
-          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: '#94A3B8' }}>
+          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: '#475569' }}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -265,7 +261,7 @@ const Navbar = () => {
               sx={{
                 borderRadius: '10px',
                 mb: 0.5,
-                color: 'rgba(241,245,249,0.9)',
+                color: '#475569',
                 fontWeight: 600,
                 '&:hover': { background: 'rgba(6,182,212,0.1)', color: '#06B6D4' },
               }}
@@ -278,7 +274,7 @@ const Navbar = () => {
               component={RouterLink}
               to="/profile"
               onClick={() => setDrawerOpen(false)}
-              sx={{ borderRadius: '10px', mb: 0.5, color: 'rgba(241,245,249,0.9)', '&:hover': { background: 'rgba(6,182,212,0.1)', color: '#06B6D4' } }}
+              sx={{ borderRadius: '10px', mb: 0.5, color: '#475569', '&:hover': { background: 'rgba(6,182,212,0.1)', color: '#06B6D4' } }}
             >
               <ListItemText primary="Profile" primaryTypographyProps={{ fontWeight: 600 }} />
             </ListItem>
@@ -333,3 +329,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+

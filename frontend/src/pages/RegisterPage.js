@@ -1,19 +1,20 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Box, Button, Typography, Alert, CircularProgress,
   Select, MenuItem, FormControl
 } from '@mui/material';
-import { AccountBalanceWallet, PersonAdd, CloudUpload, CheckCircle } from '@mui/icons-material';
+import { AccountBalanceWallet, PersonAdd, CloudUpload, CheckCircle, ContactPhone } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useMetaMask } from '../hooks/useMetaMask';
 import { useSnackbar } from 'notistack';
+import api from '../services/api';
 
 const GlassInput = ({ label, type = 'text', value, onChange, name, required, disabled, placeholder }) => (
   <Box sx={{ mb: 2 }}>
-    <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
-      {label}{required && <Box component="span" sx={{ color: '#EC4899', ml: 0.5 }}>*</Box>}
+    <Typography variant="caption" sx={{ color: '#334155', fontWeight: 600, mb: 0.5, display: 'block', letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.68rem' }}>
+      {label}{required && <Box component="span" sx={{ color: '#EF4444', ml: 0.5 }}>*</Box>}
     </Typography>
     <Box
       component="input"
@@ -26,18 +27,18 @@ const GlassInput = ({ label, type = 'text', value, onChange, name, required, dis
       placeholder={placeholder}
       sx={{
         width: '100%', px: 2, py: 1.4,
-        background: 'rgba(15,23,42,0.6)',
-        border: '1px solid rgba(139,92,246,0.25)',
-        borderRadius: '12px',
-        color: '#F1F5F9',
+        background: '#FFFFFF',
+        border: '1.5px solid #E2E8F0',
+        borderRadius: '10px',
+        color: '#0F172A',
         fontSize: '0.93rem',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         outline: 'none',
-        transition: 'all 0.3s',
+        transition: 'all 0.2s',
         boxSizing: 'border-box',
-        '&:focus': { border: '1px solid #06B6D4', boxShadow: '0 0 0 3px rgba(6,182,212,0.15)' },
-        '&::placeholder': { color: '#334155' },
-        '&:disabled': { opacity: 0.5 },
+        '&:focus': { border: '1.5px solid #06B6D4', boxShadow: '0 0 0 3px rgba(6,182,212,0.12)' },
+        '&::placeholder': { color: '#94A3B8' },
+        '&:disabled': { opacity: 0.5, background: '#F1F5F9' },
       }}
     />
   </Box>
@@ -45,8 +46,8 @@ const GlassInput = ({ label, type = 'text', value, onChange, name, required, dis
 
 const GlassSelect = ({ label, value, onChange, name, required, children }) => (
   <Box sx={{ mb: 2 }}>
-    <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
-      {label}{required && <Box component="span" sx={{ color: '#EC4899', ml: 0.5 }}>*</Box>}
+    <Typography variant="caption" sx={{ color: '#334155', fontWeight: 600, mb: 0.5, display: 'block', letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.68rem' }}>
+      {label}{required && <Box component="span" sx={{ color: '#EF4444', ml: 0.5 }}>*</Box>}
     </Typography>
     <Box component="select"
       value={value}
@@ -55,18 +56,18 @@ const GlassSelect = ({ label, value, onChange, name, required, children }) => (
       required={required}
       sx={{
         width: '100%', px: 1.5, py: 1.4,
-        background: 'rgba(15,23,42,0.6)',
-        border: '1px solid rgba(139,92,246,0.25)',
-        borderRadius: '12px',
-        color: value ? '#F1F5F9' : '#334155',
+        background: '#FFFFFF',
+        border: '1.5px solid #E2E8F0',
+        borderRadius: '10px',
+        color: '#0F172A',
         fontSize: '0.93rem',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         outline: 'none',
-        transition: 'all 0.3s',
+        transition: 'all 0.2s',
         boxSizing: 'border-box',
         cursor: 'pointer',
-        '&:focus': { border: '1px solid #06B6D4', boxShadow: '0 0 0 3px rgba(6,182,212,0.15)' },
-        '& option': { background: '#0F172A', color: '#F1F5F9' },
+        '&:focus': { border: '1.5px solid #06B6D4', boxShadow: '0 0 0 3px rgba(6,182,212,0.12)' },
+        '& option': { background: '#FFFFFF', color: '#0F172A' },
       }}
     >
       {children}
@@ -76,7 +77,7 @@ const GlassSelect = ({ label, value, onChange, name, required, children }) => (
 
 const FileUploadButton = ({ label, file, name, onChange, accept, required }) => (
   <Box sx={{ mb: 2 }}>
-    <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+    <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
       {label}{required && <Box component="span" sx={{ color: '#EC4899', ml: 0.5 }}>*</Box>}
     </Typography>
     <Box
@@ -84,7 +85,7 @@ const FileUploadButton = ({ label, file, name, onChange, accept, required }) => 
       sx={{
         display: 'flex', alignItems: 'center', gap: 1.5,
         px: 2, py: 1.4, cursor: 'pointer',
-        background: file ? 'rgba(52,211,153,0.08)' : 'rgba(15,23,42,0.6)',
+        background: file ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.82)',
         border: `1px dashed ${file ? 'rgba(52,211,153,0.4)' : 'rgba(139,92,246,0.25)'}`,
         borderRadius: '12px',
         transition: 'all 0.3s',
@@ -94,9 +95,9 @@ const FileUploadButton = ({ label, file, name, onChange, accept, required }) => 
       {file ? (
         <CheckCircle sx={{ fontSize: 18, color: '#34D399', flexShrink: 0 }} />
       ) : (
-        <CloudUpload sx={{ fontSize: 18, color: '#64748B', flexShrink: 0 }} />
+        <CloudUpload sx={{ fontSize: 18, color: '#334155', flexShrink: 0 }} />
       )}
-      <Typography variant="body2" sx={{ color: file ? '#34D399' : '#64748B', fontSize: '0.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <Typography variant="body2" sx={{ color: file ? '#34D399' : '#334155', fontSize: '0.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {file ? file.name : `Choose ${label}`}
       </Typography>
       <input type="file" name={name} hidden accept={accept} onChange={onChange} />
@@ -116,8 +117,30 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({ name: '', age: '', gender: '', email: '', role: '' });
   const [files, setFiles] = useState({ license: null, vehiclePapers: null, profilePic: null });
 
+  // Emergency contact (passenger only)
+  const [emergencyContact, setEmergencyContact] = useState({ name: '', phone: '', email: '', relationship: '' });
+
+  // Referral code (pre-filled from URL ?ref=CODE)
+  const [referralCode, setReferralCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('ref') || '';
+  });
+  const [referralValid, setReferralValid] = useState(null); // null | true | false
+
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
   const handleFileChange = (e) => setFiles({ ...files, [e.target.name]: e.target.files[0] });
+  const handleECChange = (e) => setEmergencyContact({ ...emergencyContact, [e.target.name]: e.target.value });
+
+  // Validate referral code on blur
+  const handleReferralBlur = async () => {
+    if (!referralCode.trim()) { setReferralValid(null); return; }
+    try {
+      await api.post('/api/referral/validate', { referralCode: referralCode.trim() });
+      setReferralValid(true);
+    } catch (_) {
+      setReferralValid(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,6 +152,17 @@ const RegisterPage = () => {
       if (formData.role === 'driver' && (!files.license || !files.vehiclePapers)) {
         throw new Error('Drivers must upload license and vehicle papers');
       }
+      if (formData.role === 'passenger') {
+        if (!emergencyContact.name || !emergencyContact.phone) {
+          throw new Error('Please fill in emergency contact name and phone number.');
+        }
+      }
+
+      const fullFormData = {
+        ...formData,
+        ...(formData.role === 'passenger' && { emergencyContact: JSON.stringify(emergencyContact) })
+      };
+
       let result;
       if (useWallet) {
         let walletAddress = account;
@@ -139,13 +173,24 @@ const RegisterPage = () => {
         const message = `Register to WayFair | Wallet: ${walletAddress} | Timestamp: ${Date.now()}`;
         const signature = await signMessage(message);
         if (!signature) throw new Error('Failed to sign message');
-        result = await registerWithWallet(formData, files, walletAddress, message, signature);
-        enqueueSnackbar('Welcome to WayFair!', { variant: 'success' });
+        result = await registerWithWallet(fullFormData, files, walletAddress, message, signature);
+        enqueueSnackbar('Welcome to WayFair! 🎉', { variant: 'success' });
       } else {
-        result = await register(formData, files);
+        result = await register(fullFormData, files);
         enqueueSnackbar('Account created! Check your email to verify.', { variant: 'success' });
         alert(`IMPORTANT: Save these keys securely!\n\nUser ID: ${result.userID}\nPseudo ID: ${result.pseudoID}\n\nYour private key has been saved locally. Do not lose it!`);
       }
+
+      if (referralCode.trim() && result?.userID) {
+        try {
+          await api.post('/api/referral/apply', {
+            referralCode: referralCode.trim().toUpperCase(),
+            newUserID: result.userID,
+          });
+          enqueueSnackbar('🎁 Referral code applied! Bonus XP credited.', { variant: 'info' });
+        } catch (_) {}
+      }
+
       navigate('/login');
     } catch (err) {
       setError(err.message || err);
@@ -155,7 +200,7 @@ const RegisterPage = () => {
 
   return (
     <Box sx={{
-      minHeight: '100vh', background: '#030712',
+      minHeight: '100vh', background: '#F8FAFC',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       px: 2, pt: 10, pb: 6, position: 'relative', overflow: 'hidden',
     }}>
@@ -185,21 +230,21 @@ const RegisterPage = () => {
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
           }}>WayFair</Typography>
-          <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
-            Create your account � free forever
+          <Typography variant="body2" sx={{ color: '#334155', mt: 0.5 }}>
+            Create your account ? free forever
           </Typography>
         </Box>
 
         {/* Card */}
         <Box sx={{
-          background: 'rgba(15,23,42,0.85)',
+          background: 'rgba(255,255,255,0.95)',
           backdropFilter: 'blur(24px)',
           border: '1px solid rgba(139,92,246,0.25)',
           borderRadius: '24px',
           p: { xs: 3, md: 4 },
           boxShadow: '0 20px 80px rgba(0,0,0,0.5)',
         }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 3, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 3, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
             <PersonAdd sx={{ color: '#06B6D4', fontSize: 22 }} />
             Create Account
           </Typography>
@@ -213,7 +258,7 @@ const RegisterPage = () => {
                   py: 1.2, borderRadius: '12px', fontWeight: 600, fontSize: '0.88rem',
                   background: !useWallet ? 'rgba(6,182,212,0.15)' : 'rgba(15,23,42,0.4)',
                   border: !useWallet ? '1px solid rgba(6,182,212,0.5)' : '1px solid rgba(139,92,246,0.2)',
-                  color: !useWallet ? '#06B6D4' : '#94A3B8',
+                  color: !useWallet ? '#06B6D4' : '#475569',
                   '&:hover': { background: 'rgba(6,182,212,0.1)' },
                 }}
               >{`\u{1F511}`} Keys Auth</Button>
@@ -223,7 +268,7 @@ const RegisterPage = () => {
                   py: 1.2, borderRadius: '12px', fontWeight: 600, fontSize: '0.88rem',
                   background: useWallet ? 'rgba(139,92,246,0.15)' : 'rgba(15,23,42,0.4)',
                   border: useWallet ? '1px solid rgba(139,92,246,0.5)' : '1px solid rgba(139,92,246,0.2)',
-                  color: useWallet ? '#A78BFA' : '#94A3B8',
+                  color: useWallet ? '#A78BFA' : '#475569',
                   '&:hover': { background: 'rgba(139,92,246,0.1)' },
                 }}
               ><AccountBalanceWallet sx={{ fontSize: 16, mr: 0.5 }} /> MetaMask</Button>
@@ -274,6 +319,57 @@ const RegisterPage = () => {
               </Box>
             )}
 
+            {/* Emergency Contact — Required for Passengers */}
+            {formData.role === 'passenger' && (
+              <Box sx={{ mt: 0.5, mb: 2, p: 2.5, borderRadius: '14px', background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <Typography variant="caption" sx={{ color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5, fontSize: '0.75rem' }}>
+                  <ContactPhone sx={{ fontSize: 15 }} /> Emergency Contact (Required for your safety)
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 2 }}>
+                  This person will be alerted if you press SOS during a ride.
+                </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                  <GlassInput label="Contact Name" name="name" value={emergencyContact.name} onChange={handleECChange} required placeholder="Mom / Dad / Friend" />
+                  <GlassInput label="Phone Number" name="phone" value={emergencyContact.phone} onChange={handleECChange} required placeholder="+91 98765 43210" />
+                </Box>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                  <GlassInput label="Email (Optional)" name="email" type="email" value={emergencyContact.email} onChange={handleECChange} placeholder="contact@email.com" />
+                  <GlassInput label="Relationship" name="relationship" value={emergencyContact.relationship} onChange={handleECChange} placeholder="Mother / Sibling" />
+                </Box>
+              </Box>
+            )}
+
+            {/* Referral Code */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, mb: 1, display: 'block', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                Referral Code <Box component="span" sx={{ color: '#94A3B8', fontSize: '0.65rem', textTransform: 'none' }}>(Optional — get bonus XP!)</Box>
+              </Typography>
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  component="input"
+                  type="text"
+                  value={referralCode}
+                  onChange={e => { setReferralCode(e.target.value.toUpperCase()); setReferralValid(null); }}
+                  onBlur={handleReferralBlur}
+                  placeholder="e.g. WAY_AB1234_XY78"
+                  sx={{
+                    width: '100%', px: 2, py: 1.4, boxSizing: 'border-box',
+                    background: referralValid === true ? 'rgba(52,211,153,0.06)' : referralValid === false ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.82)',
+                    border: `1px solid ${referralValid === true ? 'rgba(52,211,153,0.5)' : referralValid === false ? 'rgba(239,68,68,0.5)' : 'rgba(139,92,246,0.25)'}`,
+                    borderRadius: '12px', color: '#0F172A', fontSize: '0.93rem',
+                    fontFamily: 'monospace', outline: 'none', transition: 'all 0.3s',
+                    '&:focus': { border: '1px solid #06B6D4', boxShadow: '0 0 0 3px rgba(6,182,212,0.15)' },
+                  }}
+                />
+                {referralValid === true && (
+                  <Box sx={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#34D399', fontSize: '1.1rem' }}>✓</Box>
+                )}
+                {referralValid === false && (
+                  <Box sx={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#EF4444', fontSize: '0.8rem', fontWeight: 700 }}>Invalid</Box>
+                )}
+              </Box>
+            </Box>
+
             <FileUploadButton label="Profile Picture (Optional)" file={files.profilePic} name="profilePic" onChange={handleFileChange} accept="image/*" />
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ marginTop: '12px' }}>
@@ -295,7 +391,7 @@ const RegisterPage = () => {
           </Box>
 
           <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid rgba(139,92,246,0.15)', textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: '#64748B' }}>
+            <Typography variant="body2" sx={{ color: '#334155' }}>
               Already have an account?{' '}
               <Box
                 component={RouterLink}

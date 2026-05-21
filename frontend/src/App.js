@@ -21,6 +21,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import BlockchainExplorer from './pages/BlockchainExplorer';
 import ReferralPage from './pages/ReferralPage';
+import LiveRidePage from './pages/LiveRidePage';
 
 // Components
 import Navbar from './components/Navbar';
@@ -43,6 +44,10 @@ function App() {
           <Route
             path="/dashboard"
             element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/live/:rideID"
+            element={isAuthenticated ? <LiveRidePage /> : <Navigate to="/login" />}
           />
           
           {/* Driver Routes */}

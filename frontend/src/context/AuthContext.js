@@ -19,14 +19,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Restore session from either stored-keys login or wallet login
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    
+
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      try {
+        const parsed = JSON.parse(savedUser);
+        setUser(parsed);
+        setIsAuthenticated(true);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      } catch (_) {}
     }
     setLoading(false);
   }, []);
@@ -149,6 +152,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    // Clear wallet session if present (do NOT clear keyData — stored-keys users need it)
+    localStorage.removeItem('walletData');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
     setIsAuthenticated(false);
@@ -202,21 +208,19 @@ export const AuthProvider = ({ children }) => {
 
       const { token, user: userData } = response.data;
 
-      // Save token and user data
+      // ─── IMPORTANT: Store wallet session SEPARATELY from stored-key session ───
+      // Never touch 'keyData' — that belongs to stored-keys users only
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('userRole', userData.role);
+      // Store wallet-specific data under its own key
+      localStorage.setItem('walletData', JSON.stringify({
+        userID:        userData.userID,
+        walletAddress: userData.walletAddress || walletAddress,
+        role:          userData.role,
+        authMethod:    'wallet',
+      }));
 
-      // Also persist to keyData so components that read keyData work for wallet users
-      const existingKeyData = JSON.parse(localStorage.getItem('keyData') || '{}');
-      const mergedKeyData = {
-        ...existingKeyData,
-        userID: userData.userID,
-        walletAddress: userData.walletAddress,
-        role: userData.role,
-      };
-      localStorage.setItem('keyData', JSON.stringify(mergedKeyData));
-      
       setUser(userData);
       setIsAuthenticated(true);
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Button, Container, Typography, Grid } from '@mui/material';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -59,7 +59,7 @@ const FeatureCard = ({ icon, title, description, delay = 0, color = '#06B6D4' })
       height: '100%',
       p: 3.5,
       borderRadius: '20px',
-      background: 'rgba(15,23,42,0.7)',
+      background: 'rgba(255,255,255,0.88)',
       backdropFilter: 'blur(20px)',
       border: '1px solid rgba(139,92,246,0.2)',
       transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
@@ -91,10 +91,10 @@ const FeatureCard = ({ icon, title, description, delay = 0, color = '#06B6D4' })
       }}>
         {icon}
       </Box>
-      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5, color: '#F1F5F9', fontSize: '1.05rem' }}>
+      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5, color: 'text.primary', fontSize: '1.05rem' }}>
         {title}
       </Typography>
-      <Typography variant="body2" sx={{ color: '#94A3B8', lineHeight: 1.7, fontSize: '0.9rem' }}>
+      <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7, fontSize: '0.9rem' }}>
         {description}
       </Typography>
     </Box>
@@ -131,7 +131,7 @@ const StatCard = ({ value, label, suffix = '', gradient, delay = 0 }) => {
       <Box sx={{
         textAlign: 'center', p: 3,
         borderRadius: '20px',
-        background: 'rgba(15,23,42,0.6)',
+        background: 'rgba(255,255,255,0.82)',
         border: '1px solid rgba(139,92,246,0.15)',
         backdropFilter: 'blur(20px)',
         transition: 'all 0.3s',
@@ -148,7 +148,7 @@ const StatCard = ({ value, label, suffix = '', gradient, delay = 0 }) => {
         }}>
           {started ? count : 0}{suffix}
         </Typography>
-        <Typography variant="body1" sx={{ color: '#94A3B8', fontWeight: 500, mt: 0.5 }}>
+        <Typography variant="body1" sx={{ color: '#475569', fontWeight: 500, mt: 0.5 }}>
           {label}
         </Typography>
         <Box sx={{
@@ -180,10 +180,10 @@ const StepCard = ({ number, title, description, delay = 0 }) => (
         {number}
       </Box>
       <Box>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: '#F1F5F9', fontSize: '1rem' }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: 'text.primary', fontSize: '1rem' }}>
           {title}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#94A3B8', lineHeight: 1.7 }}>
+        <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7 }}>
           {description}
         </Typography>
       </Box>
@@ -199,12 +199,12 @@ const HomePage = () => {
   const heroY = useTransform(scrollYProgress, [0, 0.6], [0, -80]);
 
   const features = [
-    { icon: '\u{1F697}', title: 'Carpool & Connect', description: 'Share rides, split costs, and meet new people on your daily commute. Eco-friendly and social.', color: '#06B6D4' },
-    { icon: '\u{1F517}', title: 'Blockchain Security', description: 'Every transaction recorded on Hyperledger Fabric. Transparent, immutable, and trustworthy.', color: '#8B5CF6' },
-    { icon: '\u26A1', title: 'Instant Booking', description: 'Find and book rides in seconds with our smart matching algorithm and real-time availability.', color: '#EC4899' },
-    { icon: '\u{1F6E1}\uFE0F', title: 'Safe & Verified', description: 'All drivers are background-checked. Real-time tracking and SOS emergency alerts keep you safe.', color: '#34D399' },
-    { icon: '\u{1F4B3}', title: 'Multi-Payment', description: 'Pay your way - cash, UPI, or Ethereum crypto. Seamless and flexible payment options.', color: '#FBBF24' },
-    { icon: '\u{1F4CD}', title: 'Live Tracking', description: 'Real-time GPS tracking. Share your trip with loved ones and get accurate ETAs.', color: '#F87171' },
+    { icon: '🚗', title: 'Carpool & Connect', description: 'Share rides, split costs, and meet new people on your daily commute. Eco-friendly and social.', color: '#06B6D4' },
+    { icon: '🔗', title: 'Blockchain Security', description: 'Every transaction recorded on Hyperledger Fabric. Transparent, immutable, and trustworthy.', color: '#8B5CF6' },
+    { icon: '⚡', title: 'Instant Booking', description: 'Find and book rides in seconds with our smart matching algorithm and real-time availability.', color: '#EC4899' },
+    { icon: '🛡️', title: 'Safe & Verified', description: 'All drivers are background-checked. Real-time tracking and SOS emergency alerts keep you safe.', color: '#34D399' },
+    { icon: '💳', title: 'Multi-Payment', description: 'Pay your way — cash, UPI, or Ethereum crypto. Seamless and flexible payment options.', color: '#FBBF24' },
+    { icon: '📍', title: 'Live Tracking', description: 'Real-time GPS tracking. Share your trip with loved ones and get accurate ETAs.', color: '#F87171' },
   ];
 
   const steps = [
@@ -232,7 +232,7 @@ const HomePage = () => {
   const gradients = ['linear-gradient(135deg,#06B6D4,#8B5CF6)', 'linear-gradient(135deg,#8B5CF6,#EC4899)', 'linear-gradient(135deg,#EC4899,#F97316)', 'linear-gradient(135deg,#34D399,#06B6D4)', 'linear-gradient(135deg,#FBBF24,#EC4899)', 'linear-gradient(135deg,#8B5CF6,#34D399)'];
 
   return (
-    <Box sx={{ background: '#030712', minHeight: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ background: '#F8FAFC', minHeight: '100vh', overflow: 'hidden' }}>
       <FloatingOrbs />
 
       {/* --- HERO --- */}
@@ -294,13 +294,13 @@ const HomePage = () => {
                   fontFamily: '"Plus Jakarta Sans", sans-serif',
                 }}>
                   <GradientText gradient="linear-gradient(135deg, #06B6D4 0%, #8B5CF6 50%, #EC4899 100%)">Way</GradientText>
-                  <Box component="span" sx={{ color: '#F1F5F9' }}>Fair</Box>
+                  <Box component="span" sx={{ color: 'text.primary' }}>Fair</Box>
                 </Typography>
                 <Typography variant="h2" sx={{
                   fontWeight: 700,
                   fontSize: { xs: '1.6rem', sm: '2.2rem', md: '2.8rem' },
                   mb: 3,
-                  color: '#94A3B8',
+                  color: '#475569',
                   letterSpacing: '-0.02em',
                   fontFamily: '"Plus Jakarta Sans", sans-serif',
                 }}>
@@ -310,11 +310,11 @@ const HomePage = () => {
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
                 <Typography variant="h5" sx={{
-                  color: '#64748B', mb: 5, fontWeight: 400, lineHeight: 1.7,
+                  color: '#334155', mb: 5, fontWeight: 400, lineHeight: 1.7,
                   fontSize: { xs: '1rem', md: '1.1rem' },
                   maxWidth: 560, mx: 'auto',
                 }}>
-                  Decentralized ridesharing powered by blockchain � transparent, secure, and community-driven. Your journey, your way.
+                  Decentralized ridesharing powered by blockchain — transparent, secure, and community-driven. Your journey, your way.
                 </Typography>
               </motion.div>
 
@@ -352,7 +352,7 @@ const HomePage = () => {
 
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.5 }}>
                 <Box sx={{ mt: 5, display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  {['\u{1F517} Hyperledger Fabric', '\u{1F6E1}\uFE0F End-to-End Safe', '\u{1F4B0} Save up to 70%'].map((item) => (
+                  {['🔗 Hyperledger Fabric', '🛡️ End-to-End Safe', '💰 Save up to 70%'].map((item) => (
                     <Typography key={item} variant="caption" sx={{ color: '#475569', fontWeight: 500, fontSize: '0.82rem' }}>
                       {item}
                     </Typography>
@@ -400,9 +400,9 @@ const HomePage = () => {
               </Typography>
               <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, mb: 2, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                 <GradientText gradient="linear-gradient(135deg, #06B6D4, #8B5CF6)">Everything you need</GradientText>
-                <Box component="span" sx={{ color: '#F1F5F9' }}> to ride better</Box>
+                <Box component="span" sx={{ color: 'text.primary' }}> to ride better</Box>
               </Typography>
-              <Typography variant="body1" sx={{ color: '#94A3B8', maxWidth: 500, mx: 'auto', fontSize: '1.05rem' }}>
+              <Typography variant="body1" sx={{ color: '#475569', maxWidth: 500, mx: 'auto', fontSize: '1.05rem' }}>
                 Combining community carpooling with blockchain security for an unmatched rideshare experience.
               </Typography>
             </Box>
@@ -422,11 +422,11 @@ const HomePage = () => {
             <Grid item xs={12} md={5}>
               <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
                 <Typography variant="overline" sx={{ color: '#06B6D4', fontWeight: 700, letterSpacing: '0.15em', mb: 2, display: 'block' }}>HOW IT WORKS</Typography>
-                <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '2.8rem' }, mb: 3, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
+                <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '2.8rem' }, mb: 3, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
                   Up and riding in{' '}
                   <GradientText gradient="linear-gradient(135deg, #06B6D4, #8B5CF6)">3 simple steps</GradientText>
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#94A3B8', mb: 5, lineHeight: 1.8 }}>
+                <Typography variant="body1" sx={{ color: '#475569', mb: 5, lineHeight: 1.8 }}>
                   Join thousands of riders and drivers already on the platform. It's free to get started.
                 </Typography>
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -459,7 +459,7 @@ const HomePage = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <Box sx={{ textAlign: 'center', mb: 8 }}>
               <Typography variant="overline" sx={{ color: '#EC4899', fontWeight: 700, letterSpacing: '0.15em', mb: 2, display: 'block' }}>COMMUNITY LOVE</Typography>
-              <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+              <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                 Loved by <GradientText gradient="linear-gradient(135deg, #EC4899, #8B5CF6)">thousands</GradientText>
               </Typography>
             </Box>
@@ -473,7 +473,7 @@ const HomePage = () => {
               {[...testimonials, ...testimonials].map((t, i) => (
                 <Box key={i} sx={{
                   width: 300, flexShrink: 0, p: 3, borderRadius: '20px',
-                  background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(139,92,246,0.2)', backdropFilter: 'blur(20px)',
+                  background: 'rgba(255,255,255,0.88)', border: '1px solid rgba(139,92,246,0.2)', backdropFilter: 'blur(20px)',
                   transition: 'all 0.3s',
                   '&:hover': { border: '1px solid rgba(6,182,212,0.4)', transform: 'translateY(-4px)' },
                 }}>
@@ -485,19 +485,19 @@ const HomePage = () => {
                       fontWeight: 800, fontSize: '1rem', color: 'white', flexShrink: 0,
                     }}>{t.avatar}</Box>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#F1F5F9', fontSize: '0.9rem' }}>{t.name}</Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>{t.handle}</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.9rem' }}>{t.name}</Typography>
+                      <Typography variant="caption" sx={{ color: '#334155' }}>{t.handle}</Typography>
                     </Box>
                   </Box>
-                  <Typography variant="body2" sx={{ color: '#94A3B8', lineHeight: 1.7, fontSize: '0.88rem' }}>"{t.text}"</Typography>
+                  <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7, fontSize: '0.88rem' }}>"{t.text}"</Typography>
                   <Box sx={{ mt: 2, display: 'flex', gap: 0.5 }}>
                     {[...Array(5)].map((_, s) => <Box key={s} component="span" sx={{ color: '#FBBF24', fontSize: '0.8rem' }}>{`\u2605`}</Box>)}
                   </Box>
                 </Box>
               ))}
             </Box>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(90deg, #030712, transparent)', pointerEvents: 'none' }} />
-            <Box sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(-90deg, #030712, transparent)', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(90deg, #F8FAFC, transparent)', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(-90deg, #F8FAFC, transparent)', pointerEvents: 'none' }} />
           </Box>
         </Container>
       </Box>
@@ -512,11 +512,11 @@ const HomePage = () => {
               border: '1px solid rgba(139,92,246,0.3)', backdropFilter: 'blur(30px)',
               position: 'relative', overflow: 'hidden',
             }}>
-              <Typography variant="h2" sx={{ fontWeight: 900, fontSize: { xs: '2rem', md: '3.5rem' }, mb: 3, color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+              <Typography variant="h2" sx={{ fontWeight: 900, fontSize: { xs: '2rem', md: '3.5rem' }, mb: 3, color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                 Ready to ride{' '}
                 <GradientText gradient="linear-gradient(135deg, #06B6D4, #8B5CF6, #EC4899)">smarter?</GradientText>
               </Typography>
-              <Typography variant="body1" sx={{ color: '#94A3B8', mb: 5, fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ color: '#475569', mb: 5, fontSize: '1.1rem' }}>
                 Join 500,000+ users already on WayFair. Free to start, forever.
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -548,13 +548,16 @@ const HomePage = () => {
       </Box>
 
       {/* --- FOOTER --- */}
-      <Box component="footer" sx={{ py: 4, textAlign: 'center', borderTop: '1px solid rgba(139,92,246,0.15)', position: 'relative', zIndex: 1 }}>
-        <Typography variant="body2" sx={{ color: '#334155' }}>
-          � 2026{' '}
+      <Box component="footer" sx={{ py: 5, textAlign: 'center', borderTop: '1px solid rgba(139,92,246,0.15)', position: 'relative', zIndex: 1, background: 'rgba(248,250,252,0.8)' }}>
+        <Typography variant="body2" sx={{ color: '#475569', mb: 1 }}>
+          Built with ❤️ on Hyperledger Fabric · Razorpay · IPFS
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#94A3B8' }}>
+          © 2026{' '}
           <Box component="span" sx={{ background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 700 }}>
             WayFair
           </Box>
-          {' '}� Ride Smarter, Together.
+          {' '}· Ride Smarter, Together.
         </Typography>
       </Box>
     </Box>
