@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container, Box, Typography, Paper, Alert, Card, CardContent,
@@ -7,10 +7,11 @@ import {
 } from '@mui/material';
 import {
   DirectionsCar, LocationOn, AccessTime, EventSeat, AttachMoney, Add,
-  PlayArrow, Stop, Cancel, Person, ExpandMore, ExpandLess, Chat
+  PlayArrow, Stop, Cancel, Person, ExpandMore, ExpandLess, Chat, GpsFixed, Lock
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import api from '../../services/api';
+import OTPVerifyDialog from '../../components/OTPVerifyDialog';
 
 const statusColor = (s) => ({ scheduled:'primary', created:'primary', 'in-progress':'warning', started:'warning', completed:'success', cancelled:'error' }[s] || 'default');
 const statusStyle = (s) => {
@@ -22,7 +23,7 @@ const statusStyle = (s) => {
     completed: { bg: 'rgba(52,211,153,0.15)', color: '#34D399', border: 'rgba(52,211,153,0.3)' },
     cancelled: { bg: 'rgba(239,68,68,0.15)', color: '#F87171', border: 'rgba(239,68,68,0.3)' },
   };
-  return map[s] || { bg: 'rgba(100,116,139,0.15)', color: '#94A3B8', border: 'rgba(100,116,139,0.3)' };
+  return map[s] || { bg: 'rgba(100,116,139,0.15)', color: '#475569', border: 'rgba(100,116,139,0.3)' };
 };
 
 const cleanAddr = (v) => (!v || v === 'undefined' || v === 'null' ? null : v);
@@ -50,6 +51,13 @@ const MyRidesPage = () => {
   const [rideBookings, setRideBookings] = useState({});
   const [actionLoading, setActionLoading] = useState({});
   const [expandedRide, setExpandedRide] = useState(null);
+
+  // OTP dialog state
+  const [otpDialog, setOtpDialog] = useState({ open: false, rideID: null, bookingID: null });
+
+  // Passenger profiles: passengerID → { name, profilePic }
+  const [passengerProfiles, setPassengerProfiles] = useState({});
+
 
   const getToken = () => localStorage.getItem('token');
   const getDriverID = () => {
@@ -80,6 +88,22 @@ const MyRidesPage = () => {
         }
       }));
       setRideBookings(bookingsMap);
+
+      // Fetch passenger public profiles
+      const allPassengerIDs = [...new Set(
+        Object.values(bookingsMap).flat().map(b => b.passengerID).filter(Boolean)
+      )];
+      const profileMap = {};
+      await Promise.all(allPassengerIDs.map(async (pID) => {
+        try {
+          const pRes = await api.get(`/api/users/${pID}/public`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          profileMap[pID] = pRes.data;
+        } catch (_) { profileMap[pID] = null; }
+      }));
+      setPassengerProfiles(profileMap);
+
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to load your rides');
     } finally {
@@ -97,7 +121,7 @@ const MyRidesPage = () => {
       await api.post(`/api/rides/${action}`, { rideID, driverID }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const msgs = { start: 'Ride started!', end: 'Ride ended!', cancel: 'Ride cancelled!' };
+      const msgs = { end: 'Ride ended! 🏁', cancel: 'Ride cancelled.' };
       enqueueSnackbar(msgs[action] || `Ride ${action}ed`, { variant: 'success' });
       fetchMyRides();
     } catch (err) {
@@ -107,19 +131,37 @@ const MyRidesPage = () => {
     }
   };
 
+  // Opens OTP dialog — driver must pick which booking's OTP to verify
+  const handleStartRide = (rideID) => {
+    const bookings = rideBookings[rideID] || [];
+    // Use first active booking for OTP
+    const activeBooking = bookings.find(b => !['cancelled'].includes(b.status)) || bookings[0];
+    if (!activeBooking) {
+      enqueueSnackbar('No active passenger booking found for this ride.', { variant: 'warning' });
+      return;
+    }
+    setOtpDialog({ open: true, rideID, bookingID: activeBooking.bookingID });
+  };
+
+  const handleOtpVerified = () => {
+    setOtpDialog({ open: false, rideID: null, bookingID: null });
+    fetchMyRides();
+  };
+
+
   if (loading) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress size={48} sx={{ color: '#06B6D4' }} />
-          <Typography sx={{ color: '#64748B', mt: 2 }}>Loading your rides...</Typography>
+          <Typography sx={{ color: '#334155', mt: 2 }}>Loading your rides...</Typography>
         </Box>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', pt: 11, pb: 8, position: 'relative' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', pt: 11, pb: 8, position: 'relative' }}>
       <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <Box sx={{ position: 'absolute', top: '10%', right: '5%', width: 450, height: 450, background: 'radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
         <Box sx={{ position: 'absolute', bottom: '15%', left: '5%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
@@ -129,7 +171,7 @@ const MyRidesPage = () => {
           {/* Header */}
           <Box sx={{
             p: 3, mb: 4,
-            background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)',
+            background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)',
             borderRadius: '24px', border: '1px solid rgba(139,92,246,0.3)',
             position: 'relative', overflow: 'hidden',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2
@@ -138,8 +180,8 @@ const MyRidesPage = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ width: 56, height: 56, borderRadius: '16px', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', boxShadow: '0 0 20px rgba(6,182,212,0.4)' }}>{`\u{1F697}`}</Box>
               <Box>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>My Rides</Typography>
-                <Typography variant="body2" sx={{ color: '#64748B' }}>{rides.length} ride{rides.length !== 1 ? 's' : ''} created</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>My Rides</Typography>
+                <Typography variant="body2" sx={{ color: '#334155' }}>{rides.length} ride{rides.length !== 1 ? 's' : ''} created</Typography>
               </Box>
             </Box>
             <Button
@@ -155,12 +197,12 @@ const MyRidesPage = () => {
           {rides.length === 0 ? (
             <Box sx={{
               p: 6, textAlign: 'center', borderRadius: '24px',
-              background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+              background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
               border: '2px dashed rgba(139,92,246,0.25)',
             }}>
               <Box sx={{ fontSize: '4rem', mb: 2 }}>{`\u{1F697}`}</Box>
-              <Typography variant="h5" sx={{ color: '#F1F5F9', fontWeight: 700, mb: 1, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>No rides yet</Typography>
-              <Typography sx={{ color: '#64748B', mb: 3 }}>Create your first ride to start offering transportation!</Typography>
+              <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 700, mb: 1, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>No rides yet</Typography>
+              <Typography sx={{ color: '#334155', mb: 3 }}>Create your first ride to start offering transportation!</Typography>
               <Button variant="contained" size="large" startIcon={<Add />} onClick={() => navigate('/driver/create-ride')}
                 sx={{ borderRadius: '14px', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', fontWeight: 700, px: 4, boxShadow: '0 8px 24px rgba(6,182,212,0.35)' }}>
                 Create First Ride
@@ -172,7 +214,7 @@ const MyRidesPage = () => {
                 <Grid item xs={12} md={6} key={ride.rideID}>
                   <Card elevation={0} sx={{
                     borderRadius: '20px',
-                    background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+                    background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(139,92,246,0.2)',
                     transition: 'all 0.3s',
                     '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 20px 60px rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.4)' }
@@ -186,7 +228,7 @@ const MyRidesPage = () => {
                         border: `1px solid ${statusStyle(ride.status).border}`,
                       }} />
                       <Chip label={ride.rideType === 'carpool' ? `\u{1F3CE}\uFE0F Carpool` : `\u{1F697} Solo`} variant="outlined" size="small"
-                        sx={{ borderColor: 'rgba(139,92,246,0.3)', color: '#94A3B8' }} />
+                        sx={{ borderColor: 'rgba(139,92,246,0.3)', color: '#475569' }} />
                     </Box>
                     <Divider sx={{ mb: 2 }} />
                     <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start', gap: 1 }}>
@@ -205,21 +247,21 @@ const MyRidesPage = () => {
                     </Box>
                     <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <AccessTime fontSize="small" color="action" />
-                        <Typography variant="body2" color="text.secondary">
+                        <AccessTime fontSize="small" sx={{ color: '#94A3B8' }} />
+                        <Typography variant="body2" sx={{ color: '#475569' }}>
                           {ride.departureTime ? new Date(ride.departureTime).toLocaleString() : 'N/A'}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <EventSeat fontSize="small" color="action" />
-                        <Typography variant="body2" color="text.secondary">
+                        <EventSeat fontSize="small" sx={{ color: '#94A3B8' }} />
+                        <Typography variant="body2" sx={{ color: '#475569' }}>
                           {ride.availableSeats} seat{ride.availableSeats !== 1 ? 's' : ''}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <AttachMoney fontSize="small" color="success" />
-                        <Typography variant="body2" color="success.main" fontWeight={600}>
-                          ?{ride.pricePerSeat}/seat
+                        <AttachMoney fontSize="small" sx={{ color: '#059669' }} />
+                        <Typography variant="body2" sx={{ color: '#059669', fontWeight: 600 }}>
+                          ₹{ride.pricePerSeat}/seat
                         </Typography>
                       </Box>
                     </Box>
@@ -244,21 +286,36 @@ const MyRidesPage = () => {
                         </Button>
                         <Collapse in={isExpanded}>
                           <List dense disablePadding sx={{ mt: 1 }}>
-                            {bookings.map((b, idx) => (
+                            {bookings.map((b, idx) => {
+                              const pID = b.passengerID;
+                              const pp = pID ? passengerProfiles[pID] : null;
+                              const passengerName = pp?.name || b.passengerName || 'Passenger';
+                              const passengerPic = pp?.profilePic
+                                ? `https://gateway.pinata.cloud/ipfs/${pp.profilePic}`
+                                : null;
+                              return (
                               <ListItem key={b.bookingID || idx} disableGutters sx={{ py: 0.5 }}>
-                                <ListItemAvatar sx={{ minWidth: 36 }}>
-                                  <Avatar sx={{ width: 28, height: 28, fontSize: 13, bgcolor: 'primary.main' }}>
-                                    {b.passengerName?.[0] || b.passengerID?.[0] || 'P'}
+                                <ListItemAvatar sx={{ minWidth: 44 }}>
+                                  <Avatar
+                                    src={passengerPic}
+                                    sx={{ width: 34, height: 34, fontSize: 13,
+                                      bgcolor: 'primary.main',
+                                      border: '2px solid rgba(139,92,246,0.3)'
+                                    }}
+                                  >
+                                    {!passengerPic && (passengerName?.[0]?.toUpperCase() || 'P')}
                                   </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
-                                  primary={b.passengerName || b.passengerID || 'Passenger'}
-                                  secondary={`${b.seatsBooked || 1} seat${(b.seatsBooked || 1) !== 1 ? 's' : ''} ? ${b.status || 'confirmed'}`}
-                                  primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
-                                  secondaryTypographyProps={{ variant: 'caption' }}
+                                  primary={passengerName}
+                                  secondary={`${b.seatsBooked || 1} seat${(b.seatsBooked || 1) !== 1 ? 's' : ''} · ${b.status || 'confirmed'}`}
+                                  primaryTypographyProps={{ variant: 'body2', fontWeight: 600, sx: { color: '#0F172A' } }}
+                                  secondaryTypographyProps={{ variant: 'caption', sx: { color: '#475569' } }}
                                 />
                               </ListItem>
-                            ))}
+                              );
+                            })}
+
                           </List>
                         </Collapse>
                       </Box>
@@ -268,17 +325,22 @@ const MyRidesPage = () => {
                     <Button size="small" variant="outlined" onClick={() => navigate(`/ride/${ride.rideID}`)}>
                       Details
                     </Button>
-                    {/* Start button ? shown when scheduled/created and has passengers */}
+                    {/* Start button — requires OTP verification */}
                     {(['scheduled', 'created'].includes(ride.status)) && (
                       <Button
                         size="small"
                         variant="contained"
                         color="success"
-                        startIcon={<PlayArrow />}
-                        disabled={actionLoading[ride.rideID] === 'start'}
-                        onClick={() => handleRideAction(ride.rideID, 'start')}
+                        startIcon={<Lock />}
+                        onClick={() => handleStartRide(ride.rideID)}
+                        sx={{
+                          background: 'linear-gradient(135deg, #34D399, #059669)',
+                          fontWeight: 700,
+                          boxShadow: '0 4px 12px rgba(52,211,153,0.4)',
+                          '&:hover': { transform: 'scale(1.03)' }
+                        }}
                       >
-                        {actionLoading[ride.rideID] === 'start' ? 'Starting?' : 'Start'}
+                        🔐 Start via OTP
                       </Button>
                     )}
                     {/* Chat button ? shown when ride is in progress */}
@@ -293,7 +355,19 @@ const MyRidesPage = () => {
                         Chat
                       </Button>
                     )}
-                    {/* End button ? shown when ride is in progress */}
+                    {/* Navigate / Live Share button */}
+                    {(['in-progress', 'started'].includes(ride.status)) && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        startIcon={<GpsFixed />}
+                        onClick={() => navigate(/live/)}
+                        sx={{ background: 'linear-gradient(135deg, #059669, #0891B2)', fontWeight: 700 }}
+                      >
+                        Navigate
+                      </Button>
+                    )}
+                    {/* End button - shown when ride is in progress */}
                     {(['in-progress', 'started'].includes(ride.status)) && (
                       <Button
                         size="small"
@@ -303,7 +377,7 @@ const MyRidesPage = () => {
                         disabled={actionLoading[ride.rideID] === 'end'}
                         onClick={() => handleRideAction(ride.rideID, 'end')}
                       >
-                        {actionLoading[ride.rideID] === 'end' ? 'Ending?' : 'End Ride'}
+                        {actionLoading[ride.rideID] === 'end' ? 'Ending...' : 'End Ride'}
                       </Button>
                     )}
                     {/* Cancel button ? shown when not already done */}
@@ -316,7 +390,7 @@ const MyRidesPage = () => {
                         disabled={actionLoading[ride.rideID] === 'cancel'}
                         onClick={() => handleRideAction(ride.rideID, 'cancel')}
                       >
-                        {actionLoading[ride.rideID] === 'cancel' ? 'Cancelling?' : 'Cancel'}
+                        {actionLoading[ride.rideID] === 'cancel' ? 'Cancelling...' : 'Cancel'}
                       </Button>
                     )}
                   </CardActions>
@@ -327,6 +401,15 @@ const MyRidesPage = () => {
         )}
         </Box>
       </Container>
+
+      {/* OTP Verify Dialog */}
+      <OTPVerifyDialog
+        open={otpDialog.open}
+        onClose={() => setOtpDialog({ open: false, rideID: null, bookingID: null })}
+        rideID={otpDialog.rideID}
+        bookingID={otpDialog.bookingID}
+        onVerified={handleOtpVerified}
+      />
     </Box>
   );
 };

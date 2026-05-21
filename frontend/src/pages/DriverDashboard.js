@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import {
@@ -87,7 +87,7 @@ const DriverDashboard = () => {
   }, [user]);
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', pt: 11, pb: 8, position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', pt: 11, pb: 8, position: 'relative', overflow: 'hidden' }}>
       {/* Background orbs */}
       <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <Box sx={{ position: 'absolute', top: '10%', right: '5%', width: 450, height: 450, background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
@@ -106,13 +106,13 @@ const DriverDashboard = () => {
             }}>{`\u{1F697}`}</Box>
             <Box>
               <Typography variant="h4" sx={{
-                fontWeight: 800, color: '#F1F5F9',
+                fontWeight: 800, color: 'text.primary',
                 fontFamily: '"Plus Jakarta Sans", sans-serif',
                 fontSize: { xs: '1.6rem', md: '2rem' },
               }}>
                 Driver Dashboard
               </Typography>
-              <Typography variant="body2" sx={{ color: '#64748B', mt: 0.25 }}>
+              <Typography variant="body2" sx={{ color: '#334155', mt: 0.25 }}>
                 Welcome back, {user?.name || 'Driver'}! Here's your overview.
               </Typography>
             </Box>
@@ -131,7 +131,7 @@ const DriverDashboard = () => {
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: stat.delay }}>
                 <Box sx={{
                   p: 3, borderRadius: '20px', textAlign: 'center',
-                  background: 'rgba(15,23,42,0.7)',
+                  background: 'rgba(255,255,255,0.88)',
                   backdropFilter: 'blur(20px)',
                   border: '1px solid rgba(139,92,246,0.2)',
                   transition: 'all 0.3s',
@@ -147,7 +147,7 @@ const DriverDashboard = () => {
                   }}>
                     {stat.value}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500 }}>{stat.label}</Typography>
+                  <Typography variant="caption" sx={{ color: '#334155', fontWeight: 500 }}>{stat.label}</Typography>
                 </Box>
               </motion.div>
             </Grid>
@@ -167,7 +167,7 @@ const DriverDashboard = () => {
               >
                 <Box sx={{
                   p: 4, borderRadius: '24px', height: '100%',
-                  background: 'rgba(15,23,42,0.7)',
+                  background: 'rgba(255,255,255,0.88)',
                   backdropFilter: 'blur(20px)',
                   border: '1px solid rgba(139,92,246,0.2)',
                   cursor: 'pointer', transition: 'all 0.3s',
@@ -179,10 +179,10 @@ const DriverDashboard = () => {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '1.6rem', boxShadow: '0 8px 24px rgba(6,182,212,0.3)',
                   }}>{item.icon}</Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 1, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 1, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                     {item.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#64748B', mb: 3, lineHeight: 1.7 }}>
+                  <Typography variant="body2" sx={{ color: '#334155', mb: 3, lineHeight: 1.7 }}>
                     {item.desc}
                   </Typography>
                   <Button
@@ -208,16 +208,16 @@ const DriverDashboard = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Box sx={{
             p: 4, borderRadius: '24px',
-            background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+            background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
             border: '1px solid rgba(139,92,246,0.2)',
           }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 3, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 3, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
               Recent Rides
             </Typography>
             {rides.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 5 }}>
                 <Box sx={{ fontSize: '3rem', mb: 1 }}>{`\u{1F697}`}</Box>
-                <Typography sx={{ color: '#64748B' }}>No rides yet. Create your first ride to get started!</Typography>
+                <Typography sx={{ color: '#334155' }}>No rides yet. Create your first ride to get started!</Typography>
               </Box>
             ) : (
               <List disablePadding>
@@ -238,10 +238,10 @@ const DriverDashboard = () => {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem',
                     }}>{`\u{1F697}`}</Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#F1F5F9', mb: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', mb: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {ride.startAddress || ride.startLocation?.address || 'Start'} {`\u2192`} {ride.endAddress || ride.endLocation?.address || 'End'}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
+                      <Typography variant="caption" sx={{ color: '#334155' }}>
                         {ride.departureTime ? new Date(ride.departureTime).toLocaleString() : 'No time set'} {`\u00B7`} {ride.availableSeats ?? 0} seats {`\u00B7`} {`\u20B9`}{ride.pricePerSeat ?? 0}/seat
                       </Typography>
                     </Box>
@@ -255,7 +255,7 @@ const DriverDashboard = () => {
                           ? 'rgba(251,191,36,0.15)' : 'rgba(100,116,139,0.2)',
                         color: ride.status === 'completed'
                           ? '#34D399' : ['started', 'in-progress'].includes(ride.status)
-                          ? '#FBBF24' : '#94A3B8',
+                          ? '#FBBF24' : '#475569',
                         border: '1px solid',
                         borderColor: ride.status === 'completed'
                           ? 'rgba(52,211,153,0.3)' : ['started', 'in-progress'].includes(ride.status)

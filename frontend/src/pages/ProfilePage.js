@@ -98,10 +98,10 @@ const ProfilePage = () => {
 
   if (!profileData || loading) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ textAlign: 'center' }}>
           <Box sx={{ fontSize: '3rem', mb: 2 }}>{`\u{1F464}`}</Box>
-          <Typography sx={{ color: '#64748B' }}>Loading profile...</Typography>
+          <Typography sx={{ color: '#334155' }}>Loading profile...</Typography>
         </Box>
       </Box>
     );
@@ -109,15 +109,15 @@ const ProfilePage = () => {
 
   const InfoRow = ({ label, value, mono }) => (
     <Box sx={{ mb: 2.5 }}>
-      <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</Typography>
-      <Typography variant="body2" sx={{ color: '#F1F5F9', mt: 0.5, fontFamily: mono ? 'monospace' : undefined, wordBreak: 'break-all', lineHeight: 1.6 }}>
-        {value || '—'}
+      <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</Typography>
+      <Typography variant="body2" sx={{ color: '#0F172A', mt: 0.5, fontFamily: mono ? 'monospace' : undefined, wordBreak: 'break-all', lineHeight: 1.6 }}>
+        {value || '�'}
       </Typography>
     </Box>
   );
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', pt: 11, pb: 8, position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', pt: 11, pb: 8, position: 'relative', overflow: 'hidden' }}>
       {/* Background orbs */}
       <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <Box sx={{ position: 'absolute', top: '5%', right: '5%', width: 500, height: 500, background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
@@ -129,7 +129,7 @@ const ProfilePage = () => {
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <Box sx={{
             p: { xs: 3, md: 5 }, mb: 4, borderRadius: '28px',
-            background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)',
+            background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)',
             border: '1px solid rgba(139,92,246,0.3)',
             position: 'relative', overflow: 'hidden',
           }}>
@@ -175,10 +175,10 @@ const ProfilePage = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
               <Box sx={{
                 p: 3.5, borderRadius: '22px', height: '100%',
-                background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+                background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(139,92,246,0.2)',
               }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
                   {`\u{1F464}`} Personal Info
                 </Typography>
                 <Box sx={{ height: '2px', background: 'linear-gradient(90deg, #06B6D4, transparent)', mb: 2.5, borderRadius: 2 }} />
@@ -195,10 +195,10 @@ const ProfilePage = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <Box sx={{
                 p: 3.5, borderRadius: '22px', height: '100%',
-                background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+                background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(139,92,246,0.2)',
               }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
                   {`\u{1F512}`} Account Details
                 </Typography>
                 <Box sx={{ height: '2px', background: 'linear-gradient(90deg, #8B5CF6, transparent)', mb: 2.5, borderRadius: 2 }} />
@@ -216,10 +216,10 @@ const ProfilePage = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                 <Box sx={{
                   p: 3.5, borderRadius: '22px',
-                  background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+                  background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
                   border: '1px solid rgba(139,92,246,0.2)',
                 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
                     {`\u26A1`} Activity &amp; XP
                   </Typography>
                   <Box sx={{ height: '2px', background: 'linear-gradient(90deg, #FBBF24, transparent)', mb: 3, borderRadius: 2 }} />
@@ -230,14 +230,14 @@ const ProfilePage = () => {
                           <Box sx={{ textAlign: 'center', p: 2, borderRadius: '14px', background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)' }}>
                             <Box sx={{ fontSize: '1.6rem', mb: 0.5 }}>{`\u{1F697}`}</Box>
                             <Typography variant="h5" sx={{ fontWeight: 800, color: '#06B6D4', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{stats.totalRidesCreated ?? 0}</Typography>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>Rides Created</Typography>
+                            <Typography variant="caption" sx={{ color: '#334155' }}>Rides Created</Typography>
                           </Box>
                         </Grid>
                         <Grid item xs={6} sm={3}>
                           <Box sx={{ textAlign: 'center', p: 2, borderRadius: '14px', background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
                             <Box sx={{ fontSize: '1.6rem', mb: 0.5 }}>{`\u2705`}</Box>
                             <Typography variant="h5" sx={{ fontWeight: 800, color: '#34D399', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{stats.completedRides ?? 0}</Typography>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>Completed Rides</Typography>
+                            <Typography variant="caption" sx={{ color: '#334155' }}>Completed Rides</Typography>
                           </Box>
                         </Grid>
                       </>
@@ -246,14 +246,14 @@ const ProfilePage = () => {
                       <Box sx={{ textAlign: 'center', p: 2, borderRadius: '14px', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}>
                         <Box sx={{ fontSize: '1.6rem', mb: 0.5 }}>{`\u{1F4C3}`}</Box>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#8B5CF6', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{stats.totalBookings ?? 0}</Typography>
-                        <Typography variant="caption" sx={{ color: '#64748B' }}>Total Bookings</Typography>
+                        <Typography variant="caption" sx={{ color: '#334155' }}>Total Bookings</Typography>
                       </Box>
                     </Grid>
                     <Grid item xs={6} sm={3}>
                       <Box sx={{ textAlign: 'center', p: 2, borderRadius: '14px', background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)' }}>
                         <Box sx={{ fontSize: '1.6rem', mb: 0.5 }}>{`\u26A1`}</Box>
                         <Typography variant="h5" sx={{ fontWeight: 800, color: '#FBBF24', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{stats.xp ?? 0}</Typography>
-                        <Typography variant="caption" sx={{ color: '#64748B' }}>XP Points</Typography>
+                        <Typography variant="caption" sx={{ color: '#334155' }}>XP Points</Typography>
                       </Box>
                     </Grid>
                   </Grid>
@@ -268,10 +268,10 @@ const ProfilePage = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                 <Box sx={{
                   p: 3.5, borderRadius: '22px',
-                  background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+                  background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
                   border: '1px solid rgba(139,92,246,0.2)',
                 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 2.5, fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', gap: 1 }}>
                     ?? Uploaded Documents
                   </Typography>
                   <Box sx={{ height: '2px', background: 'linear-gradient(90deg, #EC4899, transparent)', mb: 3, borderRadius: 2 }} />
@@ -283,12 +283,12 @@ const ProfilePage = () => {
                       <Grid item xs={12} sm={6} key={doc.key}>
                         <Box sx={{
                           p: 3, borderRadius: '16px', textAlign: 'center',
-                          background: 'rgba(30,41,59,0.6)',
+                          background: 'rgba(248,250,252,0.95)',
                           border: '1px solid rgba(139,92,246,0.15)',
                           '&:hover': { border: '1px solid rgba(139,92,246,0.35)' }, transition: 'all 0.3s',
                         }}>
                           <Box sx={{ fontSize: '2.5rem', mb: 1 }}>{doc.icon}</Box>
-                          <Typography variant="subtitle2" sx={{ color: '#F1F5F9', fontWeight: 600, mb: 1.5 }}>{doc.label}</Typography>
+                          <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 600, mb: 1.5 }}>{doc.label}</Typography>
                           {profileData.documents?.[doc.key] ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                               <Chip label="Uploaded" size="small" sx={{ background: 'rgba(52,211,153,0.15)', color: '#34D399', border: '1px solid rgba(52,211,153,0.3)', fontWeight: 700 }} />
@@ -301,7 +301,7 @@ const ProfilePage = () => {
                               </Button>
                             </Box>
                           ) : (
-                            <Chip label="Not Uploaded" size="small" sx={{ background: 'rgba(100,116,139,0.15)', color: '#64748B', border: '1px solid rgba(100,116,139,0.25)' }} />
+                            <Chip label="Not Uploaded" size="small" sx={{ background: 'rgba(100,116,139,0.15)', color: '#334155', border: '1px solid rgba(100,116,139,0.25)' }} />
                           )}
                         </Box>
                       </Grid>
@@ -315,13 +315,13 @@ const ProfilePage = () => {
 
         {/* Document Viewer Dialog */}
         <Dialog open={openDocViewer} onClose={handleCloseDoc} maxWidth="md" fullWidth
-          PaperProps={{ sx: { background: '#0F172A', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '20px' } }}
+          PaperProps={{ sx: { background: '#FFFFFF', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '20px' } }}
         >
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(139,92,246,0.15)', pb: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
               {selectedDoc === 'license' ? '?? Driving License' : '?? Vehicle Papers'}
             </Typography>
-            <IconButton onClick={handleCloseDoc} sx={{ color: '#64748B', '&:hover': { color: '#F1F5F9', background: 'rgba(139,92,246,0.1)' } }}>
+            <IconButton onClick={handleCloseDoc} sx={{ color: '#334155', '&:hover': { color: 'text.primary', background: 'rgba(139,92,246,0.1)' } }}>
               <Close />
             </IconButton>
           </DialogTitle>
@@ -329,8 +329,8 @@ const ProfilePage = () => {
             {selectedDoc && profileData.documents?.[selectedDoc] ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Box sx={{ fontSize: '3rem', mb: 2 }}>{`\u{1F4C4}`}</Box>
-                <Typography variant="body1" sx={{ color: '#F1F5F9', mb: 1 }}>Document stored on IPFS</Typography>
-                <Box sx={{ p: 2, borderRadius: '12px', background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(139,92,246,0.2)', mb: 3 }}>
+                <Typography variant="body1" sx={{ color: 'text.primary', mb: 1 }}>Document stored on IPFS</Typography>
+                <Box sx={{ p: 2, borderRadius: '12px', background: '#F8FAFC', border: '1px solid rgba(139,92,246,0.2)', mb: 3 }}>
                   <Typography variant="body2" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', color: '#06B6D4', fontSize: '0.8rem' }}>
                     {profileData.documents[selectedDoc]}
                   </Typography>
@@ -345,7 +345,7 @@ const ProfilePage = () => {
                 </Button>
               </Box>
             ) : (
-              <Typography sx={{ color: '#64748B', textAlign: 'center', py: 3 }}>Document not available</Typography>
+              <Typography sx={{ color: '#334155', textAlign: 'center', py: 3 }}>Document not available</Typography>
             )}
           </DialogContent>
         </Dialog>
@@ -355,3 +355,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+

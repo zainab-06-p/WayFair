@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, Typography, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -16,7 +16,7 @@ const ActionCard = ({ icon, title, description, buttonLabel, onClick, gradient, 
       onClick={onClick}
       sx={{
         height: '100%', p: 3.5, borderRadius: '20px', cursor: 'pointer',
-        background: 'rgba(15,23,42,0.7)',
+        background: 'rgba(255,255,255,0.88)',
         backdropFilter: 'blur(20px)',
         border: '1px solid rgba(139,92,246,0.2)',
         transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
@@ -41,10 +41,10 @@ const ActionCard = ({ icon, title, description, buttonLabel, onClick, gradient, 
       }}>
         {icon}
       </Box>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: '#F1F5F9', mb: 1, fontSize: '1rem', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+      <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 1, fontSize: '1rem', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
         {title}
       </Typography>
-      <Typography variant="body2" sx={{ color: '#94A3B8', lineHeight: 1.7, flex: 1, fontSize: '0.88rem' }}>
+      <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7, flex: 1, fontSize: '0.88rem' }}>
         {description}
       </Typography>
       <Button
@@ -88,7 +88,7 @@ const DashboardPage = () => {
   const cards = role === 'driver' ? driverCards : passengerCards;
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', pt: 12, pb: 8, position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', pt: 12, pb: 8, position: 'relative', overflow: 'hidden' }}>
       {/* Background */}
       <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <Box sx={{ position: 'absolute', top: '10%', right: '5%', width: 500, height: 500, background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
@@ -110,7 +110,7 @@ const DashboardPage = () => {
               </Typography>
             </Box>
             <Typography variant="h3" sx={{
-              fontWeight: 800, color: '#F1F5F9', mb: 1,
+              fontWeight: 800, color: 'text.primary', mb: 1,
               fontFamily: '"Plus Jakarta Sans", sans-serif',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}>
@@ -120,7 +120,7 @@ const DashboardPage = () => {
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               }}>{displayName}</Box> {'\u{1F44B}'}
             </Typography>
-            <Typography variant="body1" sx={{ color: '#64748B', fontWeight: 400 }}>
+            <Typography variant="body1" sx={{ color: '#334155', fontWeight: 400 }}>
               {role === 'driver'
                 ? 'Manage your rides and grow your earnings on WayFair.'
                 : 'Find your next ride or manage your upcoming trips.'}
@@ -141,12 +141,12 @@ const DashboardPage = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
           <Box sx={{
             mt: 5, p: 3, borderRadius: '20px',
-            background: 'rgba(15,23,42,0.6)',
+            background: 'rgba(255,255,255,0.82)',
             border: '1px solid rgba(139,92,246,0.15)',
             backdropFilter: 'blur(20px)',
             display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center',
           }}>
-            <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, mr: 1 }}>Quick access:</Typography>
+            <Typography variant="body2" sx={{ color: '#334155', fontWeight: 600, mr: 1 }}>Quick access:</Typography>
             {[
               { label: '\u{26D3}\uFE0F Blockchain Explorer', path: '/explorer' },
               { label: '\u{1F381} Referral Program', path: '/referral' },
@@ -158,7 +158,7 @@ const DashboardPage = () => {
                 onClick={() => navigate(link.path)}
                 sx={{
                   borderRadius: '50px', fontWeight: 600, fontSize: '0.8rem',
-                  color: '#94A3B8', px: 2, py: 0.7,
+                  color: '#475569', px: 2, py: 0.7,
                   border: '1px solid rgba(139,92,246,0.2)',
                   '&:hover': { color: '#06B6D4', border: '1px solid rgba(6,182,212,0.4)', background: 'rgba(6,182,212,0.08)' },
                 }}

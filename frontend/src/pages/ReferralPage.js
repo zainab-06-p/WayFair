@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Container,
@@ -30,11 +30,14 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
 
 const api = axios.create({ baseURL: 'http://localhost:5000' });
 
+
 const ReferralPage = () => {
   const { user } = useAuth();
+  const { socket } = useSocket();
   const [referralCode, setReferralCode] = useState('');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +47,8 @@ const ReferralPage = () => {
   const [applySuccess, setApplySuccess] = useState('');
   const [applyError, setApplyError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [liveNotification, setLiveNotification] = useState(null); // real-time referral notification
+
 
   const token = localStorage.getItem('token');
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
@@ -64,7 +69,8 @@ const ReferralPage = () => {
         api.get('/api/referral/my-code', authHeaders),
         Promise.resolve(user?.userID || user?.id || '')
       ]);
-      setReferralCode(codeRes.data.referralCode);
+      setReferralCode(codeRes.data.code || codeRes.data.referralCode || '');
+
 
       if (userID) {
         try {
@@ -80,6 +86,36 @@ const ReferralPage = () => {
       setLoading(false);
     }
   };
+
+  // Real-time: listen for referral_applied socket events
+  useEffect(() => {
+    if (!socket) return;
+    const userID = user?.userID || user?.id;
+    if (userID) {
+      // Subscribe to our own room
+      socket.emit('referral:subscribe', { userID });
+    }
+
+    const handler = (data) => {
+      setLiveNotification(data);
+      // Update stats optimistically
+      setStats(prev => prev ? {
+        ...prev,
+        totalUses: (prev.totalUses || 0) + 1,
+        rewards: {
+          ...(prev.rewards || {}),
+          xp: ((prev.rewards?.xp) || 0) + (data.xpEarned || 50),
+          points: ((prev.rewards?.points) || 0) + (data.pointsEarned || 100),
+          totalReferrals: (prev.rewards?.totalReferrals || 0) + 1,
+        }
+      } : null);
+      // Auto-dismiss after 8s
+      setTimeout(() => setLiveNotification(null), 8000);
+    };
+    socket.on('referral_applied', handler);
+    return () => socket.off('referral_applied', handler);
+  }, [socket, user]);
+
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(referralCode);
@@ -130,14 +166,14 @@ const ReferralPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#030712', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress sx={{ color: '#06B6D4' }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', position: 'relative', overflow: 'hidden' }}>
       {/* Background orbs */}
       <Box sx={{ position: 'fixed', top: '10%', left: '5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <Box sx={{ position: 'fixed', bottom: '20%', right: '5%', width: 350, height: 350, borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -145,13 +181,13 @@ const ReferralPage = () => {
       <Container maxWidth="md" sx={{ pt: 4, pb: 6, position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', p: 4, mb: 3, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', p: 4, mb: 3, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
             <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #06B6D4, #8B5CF6, #EC4899)' }} />
             <Typography sx={{ fontSize: '3rem', mb: 1 }}>{`\u{1F381}`}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: '"Plus Jakarta Sans", sans-serif', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Refer &amp; Earn
             </Typography>
-            <Typography variant="body1" sx={{ color: '#94A3B8', mt: 1 }}>
+            <Typography variant="body1" sx={{ color: '#475569', mt: 1 }}>
               Share your unique code with friends. Every successful referral earns you XP rewards!
             </Typography>
           </Box>
@@ -159,19 +195,51 @@ const ReferralPage = () => {
 
         {error && <Alert severity="error" sx={{ mb: 2, background: 'rgba(239,68,68,0.1)', color: '#F87171', border: '1px solid rgba(239,68,68,0.3)' }} onClose={() => setError('')}>{error}</Alert>}
 
+        {/* Real-time notification banner */}
+        {liveNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <Box sx={{
+              mb: 3, p: 2.5, borderRadius: '16px',
+              background: 'linear-gradient(135deg, rgba(52,211,153,0.15), rgba(6,182,212,0.15))',
+              border: '2px solid rgba(52,211,153,0.4)',
+              display: 'flex', alignItems: 'center', gap: 2,
+            }}>
+              <Box sx={{ fontSize: '2rem' }}>🎉</Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography sx={{ fontWeight: 800, color: '#059669', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+                  Someone joined using your referral code!
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#475569' }}>
+                  {liveNotification.message || `+${liveNotification.xpEarned || 50} XP earned! Total referrals: ${liveNotification.totalReferrals}`}
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography sx={{ fontWeight: 900, color: '#06B6D4', fontSize: '1.3rem' }}>+{liveNotification.xpEarned || 50} XP</Typography>
+                <Typography variant="caption" sx={{ color: '#94A3B8' }}>Live update</Typography>
+              </Box>
+            </Box>
+          </motion.div>
+        )}
+
+
         <Grid container spacing={3}>
           {/* Stats Cards */}
           {[
             { emoji: '\u{1F465}', value: stats?.uses?.length ?? 0, label: 'Total Referrals', color: '#8B5CF6' },
             { emoji: '\u26A1', value: (stats?.uses?.length ?? 0) * 50, label: 'XP Earned', color: '#EC4899' },
             { emoji: '\u{1F4B0}', value: (stats?.uses?.length ?? 0) * 100, label: 'Bonus Points', color: '#06B6D4' },
+
           ].map(({ emoji, value, label, color }, i) => (
             <Grid item xs={12} sm={4} key={label}>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} whileHover={{ y: -4 }}>
-                <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: `1px solid ${color}33`, borderRadius: '16px', p: 3, textAlign: 'center' }}>
+                <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: `1px solid ${color}33`, borderRadius: '16px', p: 3, textAlign: 'center' }}>
                   <Typography sx={{ fontSize: '2rem', mb: 1 }}>{emoji}</Typography>
                   <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: '"Plus Jakarta Sans", sans-serif', color }}>{value}</Typography>
-                  <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>{label}</Typography>
+                  <Typography variant="body2" sx={{ color: '#334155', mt: 0.5 }}>{label}</Typography>
                 </Box>
               </motion.div>
             </Grid>
@@ -180,8 +248,8 @@ const ReferralPage = () => {
           {/* Your Referral Code */}
           <Grid item xs={12}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
+              <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
                   Your Referral Code
                 </Typography>
                 <Box sx={{ height: 1, background: 'rgba(139,92,246,0.2)', mb: 2 }} />
@@ -201,10 +269,10 @@ const ReferralPage = () => {
                 </Box>
 
                 <TextField fullWidth label="Shareable Link" value={referralLink} size="small"
-                  InputProps={{ readOnly: true, endAdornment: (<InputAdornment position="end"><IconButton onClick={handleCopyLink} size="small" sx={{ color: '#94A3B8' }}><ContentCopy fontSize="small" /></IconButton></InputAdornment>) }}
-                  sx={{ mb: 1, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' } }, '& .MuiInputLabel-root': { color: '#64748B' }, '& input': { color: '#94A3B8', fontFamily: 'monospace', fontSize: '0.8rem' } }}
+                  InputProps={{ readOnly: true, endAdornment: (<InputAdornment position="end"><IconButton onClick={handleCopyLink} size="small" sx={{ color: '#475569' }}><ContentCopy fontSize="small" /></IconButton></InputAdornment>) }}
+                  sx={{ mb: 1, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' } }, '& .MuiInputLabel-root': { color: '#334155' }, '& input': { color: '#475569', fontFamily: 'monospace', fontSize: '0.8rem' } }}
                 />
-                <Typography variant="caption" sx={{ color: '#64748B' }}>
+                <Typography variant="caption" sx={{ color: '#334155' }}>
                   Share this link with friends ? they'll automatically get your referral code pre-filled on registration.
                 </Typography>
               </Box>
@@ -214,12 +282,12 @@ const ReferralPage = () => {
           {/* Apply a referral code */}
           <Grid item xs={12}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-              <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
+              <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
                   Apply a Referral Code
                 </Typography>
                 <Box sx={{ height: 1, background: 'rgba(139,92,246,0.2)', mb: 2 }} />
-                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 2 }}>
+                <Typography variant="body2" sx={{ color: '#475569', mb: 2 }}>
                   Got a referral code from a friend? Enter it below to claim your bonus rewards.
                 </Typography>
 
@@ -228,7 +296,7 @@ const ReferralPage = () => {
 
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   <TextField label="Enter Referral Code" value={applyCode} onChange={e => setApplyCode(e.target.value.toUpperCase())} placeholder="e.g. ABC123" size="small"
-                    sx={{ minWidth: 220, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' }, '&.Mui-focused fieldset': { borderColor: '#06B6D4' } }, '& .MuiInputLabel-root': { color: '#64748B' }, '& input': { color: '#F1F5F9', letterSpacing: 2, fontFamily: 'monospace', textTransform: 'uppercase' } }}
+                    sx={{ minWidth: 220, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'rgba(139,92,246,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(6,182,212,0.5)' }, '&.Mui-focused fieldset': { borderColor: '#06B6D4' } }, '& .MuiInputLabel-root': { color: '#334155' }, '& input': { color: 'text.primary', letterSpacing: 2, fontFamily: 'monospace', textTransform: 'uppercase' } }}
                     inputProps={{ style: { letterSpacing: 2, fontFamily: 'monospace', textTransform: 'uppercase' } }}
                   />
                   <Button variant="contained" onClick={handleApplyCode} disabled={applyLoading || !applyCode.trim()} startIcon={applyLoading ? <CircularProgress size={16} /> : <CardGiftcard />}
@@ -244,8 +312,8 @@ const ReferralPage = () => {
           {stats?.uses?.length > 0 && (
             <Grid item xs={12}>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-                <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
+                <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
                     Referral History
                   </Typography>
                   <Box sx={{ height: 1, background: 'rgba(139,92,246,0.2)', mb: 2 }} />
@@ -256,8 +324,8 @@ const ReferralPage = () => {
                           <Avatar sx={{ background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', width: 36, height: 36, fontSize: '1rem' }}>{`\u{1F464}`}</Avatar>
                         </ListItemAvatar>
                         <ListItemText
-                          primary={<Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#F1F5F9' }}>{typeof use === 'string' ? use : use.userID || `User #${idx + 1}`}</Typography>}
-                          secondary={<Typography variant="caption" sx={{ color: '#64748B' }}>Joined using your code</Typography>}
+                          primary={<Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>{typeof use === 'string' ? use : use.userID || `User #${idx + 1}`}</Typography>}
+                          secondary={<Typography variant="caption" sx={{ color: '#334155' }}>Joined using your code</Typography>}
                         />
                         <Chip label="+50 XP" size="small" sx={{ background: 'rgba(52,211,153,0.15)', color: '#34D399', border: '1px solid rgba(52,211,153,0.3)', fontWeight: 700 }} />
                       </ListItem>
@@ -271,8 +339,8 @@ const ReferralPage = () => {
           {/* How it Works */}
           <Grid item xs={12}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-              <Box sx={{ background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#F1F5F9' }}>
+              <Box sx={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, fontFamily: '"Plus Jakarta Sans", sans-serif', color: 'text.primary' }}>
                   How It Works
                 </Typography>
                 <Box sx={{ height: 1, background: 'rgba(139,92,246,0.2)', mb: 2 }} />
@@ -286,7 +354,7 @@ const ReferralPage = () => {
                     <Grid item xs={12} sm={6} key={step}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1.5, borderRadius: '12px', background: 'rgba(139,92,246,0.05)' }}>
                         <Avatar sx={{ background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', width: 36, height: 36, flexShrink: 0, fontSize: '1rem' }}>{emoji}</Avatar>
-                        <Typography variant="body2" sx={{ color: '#94A3B8' }}>{text}</Typography>
+                        <Typography variant="body2" sx={{ color: '#475569' }}>{text}</Typography>
                       </Box>
                     </Grid>
                   ))}

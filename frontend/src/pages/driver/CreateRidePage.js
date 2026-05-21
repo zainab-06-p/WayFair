@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -239,7 +239,7 @@ const CreateRidePage = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', background: '#030712', pt: 10, pb: 8, position: 'relative' }}>
+    <Box sx={{ minHeight: '100vh', background: '#F8FAFC', pt: 10, pb: 8, position: 'relative' }}>
       <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <Box sx={{ position: 'absolute', top: '5%', right: '5%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
         <Box sx={{ position: 'absolute', bottom: '10%', left: '5%', width: 350, height: 350, background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)' }} />
@@ -249,17 +249,17 @@ const CreateRidePage = () => {
           {/* Header */}
           <Box sx={{
             p: { xs: 2.5, md: 4 }, mb: 3,
-            background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(24px)',
+            background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(24px)',
             borderRadius: '24px', border: '1px solid rgba(139,92,246,0.3)',
             position: 'relative', overflow: 'hidden',
           }}>
             <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #06B6D4, #8B5CF6, #EC4899)' }} />
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: '#F1F5F9', fontFamily: '"Plus Jakarta Sans", sans-serif', mb: 0.5 }}>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', fontFamily: '"Plus Jakarta Sans", sans-serif', mb: 0.5 }}>
                   {`\u{1F697}`} Create a New Ride
                 </Typography>
-                <Typography variant="body2" sx={{ color: '#64748B' }}>
+                <Typography variant="body2" sx={{ color: '#334155' }}>
                   Share your journey and earn while helping others reach their destination
                 </Typography>
               </Box>
@@ -284,7 +284,7 @@ const CreateRidePage = () => {
 
           <Box sx={{
             p: { xs: 2.5, md: 4 }, borderRadius: '24px',
-            background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(20px)',
+            background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(20px)',
             border: '1px solid rgba(139,92,246,0.2)',
           }}>
             <form onSubmit={handleSubmit}>
@@ -487,15 +487,18 @@ const CreateRidePage = () => {
 
               <TextField
                 fullWidth
-                label={`Price Per Seat (\u20B9)`}
+                label={`Price Per Seat (₹)`}
                 name="pricePerSeat"
                 type="number"
                 value={formData.pricePerSeat}
                 onChange={handleChange}
                 margin="normal"
-                inputProps={{ min: 0, step: 10 }}
+                inputProps={{ min: 1, max: 10000, step: 1 }}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                }}
                 required
-                helperText="Set a fair price for your ride"
+                helperText="Enter any fare from ₹1 to ₹10,000 per seat"
               />
 
               <FormControl fullWidth margin="normal" required>
