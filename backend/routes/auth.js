@@ -39,7 +39,7 @@ router.post('/register', upload.fields([
   { name: 'profilePic', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const { name, age, gender, email, role } = req.body;
+    const { name, age, gender, email, role, emergencyContact: ecStr } = req.body;
 
     // Validate required fields
     if (!name || !age || !gender || !email || !role) {
@@ -48,6 +48,12 @@ router.post('/register', upload.fields([
 
     if (role === 'driver' && (!req.files?.license || !req.files?.vehiclePapers)) {
       return res.status(400).json({ error: 'Drivers must upload license and vehicle papers' });
+    }
+
+    // Parse emergency contact (passengers only)
+    let emergencyContact = null;
+    if (role === 'passenger' && ecStr) {
+      try { emergencyContact = typeof ecStr === 'string' ? JSON.parse(ecStr) : ecStr; } catch(_) {}
     }
 
     // Generate key pair for pseudonymous authentication
@@ -60,6 +66,7 @@ router.post('/register', upload.fields([
       gender,
       email,
       role,
+      ...(emergencyContact && { emergencyContact }),
       registrationDate: new Date().toISOString()
     };
 
@@ -108,7 +115,8 @@ router.post('/register', upload.fields([
       keyPair.pseudoID,
       role,
       email,
-      userDataResult.ipfsHash
+      userDataResult.ipfsHash,
+      emergencyContact ? JSON.stringify(emergencyContact) : ''
     );
 
     // Generate verification token
@@ -236,21 +244,30 @@ router.post('/login', async (req, res) => {
 
     authChallenges.delete(pseudoID);
 
-    // Include userID and role in JWT if provided by client (client already proved key ownership)
-    // Fall back to blockchain/local lookup if not provided
-    let { userID, role } = req.body;
-    if (!userID || !role) {
-      try {
-        const userJSON = await fabricHelper.evaluateTransaction('GetUserByPseudoID', pseudoID);
-        const userData = userJSON && userJSON !== 'null' ? JSON.parse(userJSON) : null;
-        if (userData) {
-          userID = userID || userData.userID;
-          role = role || userData.role;
-        }
-      } catch (lookupErr) {
-        console.warn('Could not look up user by pseudoID:', lookupErr.message);
+    // ── Resolve authoritative userID & role from blockchain ─────────────────
+    // ALWAYS prefer blockchain data over client-provided values.
+    // The client's keyData.userID may have been corrupted (e.g. by a previous
+    // MetaMask login that merged wallet data into keyData).  The pseudoID is
+    // cryptographically proven above, so blockchain lookup by pseudoID is safe.
+    let { userID: clientUserID, role: clientRole } = req.body;
+    let userID = null;
+    let role   = null;
+
+    try {
+      const userJSON = await fabricHelper.evaluateTransaction('GetUserByPseudoID', pseudoID);
+      const userData = userJSON && userJSON !== 'null' ? JSON.parse(userJSON) : null;
+      if (userData) {
+        userID = userData.userID;
+        role   = userData.role;
+        console.log(`ℹ️  Login resolved from blockchain: userID=${userID} role=${role}`);
       }
+    } catch (lookupErr) {
+      console.warn('⚠️  Blockchain lookup failed, falling back to client values:', lookupErr.message);
     }
+
+    // Last resort: use whatever the client sent (covers offline / Fabric-down scenarios)
+    if (!userID) userID = clientUserID;
+    if (!role)   role   = clientRole;
 
     // Generate JWT
     const token = jwt.sign(
@@ -320,7 +337,7 @@ router.post('/register-wallet', upload.fields([
   { name: 'profilePic', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const { name, age, gender, email, role, walletAddress, message, signature } = req.body;
+    const { name, age, gender, email, role, walletAddress, message, signature, emergencyContact: ecStr } = req.body;
 
     // Validate required fields
     if (!name || !age || !gender || !email || !role || !walletAddress || !signature) {
@@ -329,6 +346,12 @@ router.post('/register-wallet', upload.fields([
 
     if (role === 'driver' && (!req.files?.license || !req.files?.vehiclePapers)) {
       return res.status(400).json({ error: 'Drivers must upload license and vehicle papers' });
+    }
+
+    // Parse emergency contact (passengers only)
+    let emergencyContact = null;
+    if (role === 'passenger' && ecStr) {
+      try { emergencyContact = typeof ecStr === 'string' ? JSON.parse(ecStr) : ecStr; } catch(_) {}
     }
 
     // Check if wallet already registered (blockchain first, then local storage)
@@ -371,6 +394,7 @@ router.post('/register-wallet', upload.fields([
       role,
       walletAddress,
       authMethod: 'wallet',
+      ...(emergencyContact && { emergencyContact }),
       registrationDate: new Date().toISOString()
     };
 
@@ -419,7 +443,8 @@ router.post('/register-wallet', upload.fields([
       walletAddress,
       role,
       email,
-      userDataResult.ipfsHash
+      userDataResult.ipfsHash,
+      emergencyContact ? JSON.stringify(emergencyContact) : ''
     );
 
     // Generate verification token
