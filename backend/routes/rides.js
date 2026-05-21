@@ -202,7 +202,8 @@ router.post('/book', authenticateToken, async (req, res) => {
   }
 });
 
-// Verify OTP and start ride (driver enters OTP given by passenger)
+// PHASE 2: Verify OTP — passenger gives OTP to driver when they board
+// This confirms passenger is seated; payment is now unlocked
 router.post('/verify-otp', authenticateToken, async (req, res) => {
   try {
     const { rideID, bookingID, otp } = req.body;
@@ -213,20 +214,20 @@ router.post('/verify-otp', authenticateToken, async (req, res) => {
 
     const otpRecord = global.rideOTPs.get(bookingID);
     if (!otpRecord) {
-      return res.status(404).json({ error: 'OTP not found for this booking. Ask passenger to refresh.' });
+      return res.status(404).json({ error: 'OTP not found. Ask passenger to refresh their bookings page.' });
     }
 
     if (otpRecord.used) {
-      return res.status(400).json({ error: 'OTP already used — ride is already started.' });
+      return res.status(400).json({ error: 'OTP already used — passenger already confirmed as boarded.' });
     }
 
     if (new Date(otpRecord.expiresAt) < new Date()) {
       global.rideOTPs.delete(bookingID);
-      return res.status(400).json({ error: 'OTP expired. Please cancel and rebook.' });
+      return res.status(400).json({ error: 'OTP expired. Passenger must refresh to get a new OTP.' });
     }
 
     if (otpRecord.otp !== otp.trim()) {
-      return res.status(401).json({ error: 'Incorrect OTP. Please ask the passenger to read their OTP again.' });
+      return res.status(401).json({ error: 'Incorrect OTP. Ask passenger to read the code again.' });
     }
 
     // Mark OTP as used
@@ -234,56 +235,62 @@ router.post('/verify-otp', authenticateToken, async (req, res) => {
     otpRecord.usedAt = new Date().toISOString();
     global.rideOTPs.set(bookingID, otpRecord);
 
-    // Start the ride on blockchain
-    await fabricHelper.submitTransaction('StartRide', rideID);
-
-    // Get ride details for socket notification
-    let ride = null;
-    try {
-      const rideJSON = await fabricHelper.evaluateTransaction('GetRide', rideID);
-      ride = JSON.parse(rideJSON);
-    } catch (_) {}
-
-    // Emit real-time socket events
+    // Emit socket — passenger is confirmed on board, payment now enabled
     const io = req.app.get('io');
-    const startPayload = {
-      rideID,
-      bookingID,
-      message: '🚗 Ride has started! OTP verified successfully.',
+    const boardedPayload = {
+      rideID, bookingID,
+      phase: 'passenger_boarded',
+      message: 'Passenger confirmed on board! Ride is underway. Payment is now enabled.',
       timestamp: new Date().toISOString(),
     };
-    io.emit('ride_started', startPayload);
-    io.to(`ride_${rideID}`).emit('otp_verified', startPayload);
-    // Also notify the passenger's personal room
+    io.emit('passenger_boarded', boardedPayload);
+    io.to(`ride_${rideID}`).emit('passenger_boarded', boardedPayload);
     if (otpRecord.passengerID) {
-      io.to(otpRecord.passengerID).emit('otp_verified', startPayload);
+      io.to(otpRecord.passengerID).emit('passenger_boarded', boardedPayload);
     }
 
-    // Notify passengers via email (best-effort)
-    try {
-      if (ride?.passengers?.length) {
-        for (const pID of ride.passengers) {
-          const pJSON = await fabricHelper.evaluateTransaction('GetUser', pID);
-          const p = JSON.parse(pJSON);
-          if (p?.email) {
-            await emailService.sendRideNotification(p.email, 'RIDE_STARTED', {
-              rideID,
-              startLocation: ride.startLocation?.address || ride.startAddress,
-              endLocation: ride.endLocation?.address || ride.endAddress,
-            });
-          }
-        }
-      }
-    } catch (_) {}
-
     res.json({
-      message: 'OTP verified! Ride started successfully.',
-      rideID,
-      bookingID,
+      message: 'OTP verified! Passenger is on board. Ride underway.',
+      rideID, bookingID, phase: 'passenger_boarded',
     });
   } catch (error) {
     console.error('Verify OTP error:', error);
     res.status(500).json({ error: error.message || 'Failed to verify OTP' });
+  }
+});
+
+// PHASE 1: Driver departs — no OTP needed, marks ride as "in-progress" (en route to passenger)
+router.post('/depart', authenticateToken, async (req, res) => {
+  try {
+    const { rideID, driverID } = req.body;
+    if (!rideID || !driverID) return res.status(400).json({ error: 'rideID and driverID required' });
+
+    // Mark ride started on blockchain (driver is en route)
+    await fabricHelper.submitTransaction('StartRide', rideID);
+
+    // Emit socket so passenger sees "Driver is on the way"
+    const io = req.app.get('io');
+    const payload = { rideID, driverID, phase: 'en_route', message: 'Your driver has started and is on the way!', timestamp: new Date().toISOString() };
+    io.emit('ride_en_route', payload);
+    io.to(`ride_${rideID}`).emit('ride_en_route', payload);
+
+    // Email passengers (best-effort)
+    try {
+      const rideJSON = await fabricHelper.evaluateTransaction('GetRide', rideID);
+      const ride = JSON.parse(rideJSON);
+      for (const pID of (ride.passengers || [])) {
+        const pJSON = await fabricHelper.evaluateTransaction('GetUser', pID);
+        const p = JSON.parse(pJSON);
+        if (p?.email) await emailService.sendRideNotification(p.email, 'RIDE_STARTED', {
+          rideID, startLocation: ride.startLocation?.address, endLocation: ride.endLocation?.address,
+        });
+      }
+    } catch (_) {}
+
+    res.json({ message: 'Ride started! Heading to passenger pickup point.', rideID, phase: 'en_route' });
+  } catch (error) {
+    console.error('Depart error:', error);
+    res.status(500).json({ error: error.message || 'Failed to start ride' });
   }
 });
 

@@ -52,8 +52,10 @@ const MyRidesPage = () => {
   const [actionLoading, setActionLoading] = useState({});
   const [expandedRide, setExpandedRide] = useState(null);
 
-  // OTP dialog state
+  // OTP dialog state — Phase 2 (passenger boarding confirmation)
   const [otpDialog, setOtpDialog] = useState({ open: false, rideID: null, bookingID: null });
+  // Track which rides are in "en route" phase (Phase 1 done, Phase 2 pending)
+  const [enRouteRides, setEnRouteRides] = useState(new Set());
 
   // Passenger profiles: passengerID → { name, profilePic }
   const [passengerProfiles, setPassengerProfiles] = useState({});
@@ -131,13 +133,31 @@ const MyRidesPage = () => {
     }
   };
 
-  // Opens OTP dialog — driver must pick which booking's OTP to verify
-  const handleStartRide = (rideID) => {
+  // PHASE 1: Driver departs — no OTP, just start heading to passenger
+  const handleDepart = async (rideID) => {
+    setActionLoading(prev => ({ ...prev, [rideID]: 'depart' }));
+    try {
+      const token = getToken();
+      const driverID = getDriverID();
+      await api.post('/api/rides/depart', { rideID, driverID }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      enqueueSnackbar('🚗 Ride started! Head to passenger pickup point.', { variant: 'success' });
+      setEnRouteRides(prev => new Set([...prev, rideID]));
+      fetchMyRides();
+    } catch (err) {
+      enqueueSnackbar(err.response?.data?.error || 'Failed to start ride', { variant: 'error' });
+    } finally {
+      setActionLoading(prev => ({ ...prev, [rideID]: null }));
+    }
+  };
+
+  // PHASE 2: Opens OTP dialog — driver enters OTP from passenger when they board
+  const handleConfirmBoarding = (rideID) => {
     const bookings = rideBookings[rideID] || [];
-    // Use first active booking for OTP
     const activeBooking = bookings.find(b => !['cancelled'].includes(b.status)) || bookings[0];
     if (!activeBooking) {
-      enqueueSnackbar('No active passenger booking found for this ride.', { variant: 'warning' });
+      enqueueSnackbar('No active passenger booking found.', { variant: 'warning' });
       return;
     }
     setOtpDialog({ open: true, rideID, bookingID: activeBooking.bookingID });
@@ -322,74 +342,62 @@ const MyRidesPage = () => {
                     );
                   })()}
                   <CardActions sx={{ px: 2, pb: 2, pt: 0, flexWrap: 'wrap', gap: 0.5 }}>
-                    <Button size="small" variant="outlined" onClick={() => navigate(`/ride/${ride.rideID}`)}>
-                      Details
-                    </Button>
-                    {/* Start button — requires OTP verification */}
-                    {(['scheduled', 'created'].includes(ride.status)) && (
+                    <Button size="small" variant="outlined" onClick={() => navigate(`/ride/${ride.rideID}`)}>Details</Button>
+
+                    {/* PHASE 1: Start ride — driver departs, no OTP needed */}
+                    {(['scheduled', 'created'].includes(ride.status)) && !enRouteRides.has(ride.rideID) && (
                       <Button
-                        size="small"
-                        variant="contained"
-                        color="success"
-                        startIcon={<Lock />}
-                        onClick={() => handleStartRide(ride.rideID)}
-                        sx={{
-                          background: 'linear-gradient(135deg, #34D399, #059669)',
-                          fontWeight: 700,
-                          boxShadow: '0 4px 12px rgba(52,211,153,0.4)',
-                          '&:hover': { transform: 'scale(1.03)' }
-                        }}
+                        size="small" variant="contained" color="success"
+                        startIcon={actionLoading[ride.rideID] === 'depart' ? <CircularProgress size={14} color="inherit" /> : <PlayArrow />}
+                        disabled={actionLoading[ride.rideID] === 'depart'}
+                        onClick={() => handleDepart(ride.rideID)}
+                        sx={{ background: 'linear-gradient(135deg, #06B6D4, #0891B2)', fontWeight: 700, boxShadow: '0 4px 12px rgba(6,182,212,0.35)', '&:hover': { transform: 'scale(1.03)' } }}
                       >
-                        🔐 Start via OTP
+                        {actionLoading[ride.rideID] === 'depart' ? 'Starting...' : '🚗 Start Ride'}
                       </Button>
                     )}
-                    {/* Chat button ? shown when ride is in progress */}
-                    {(['in-progress', 'started'].includes(ride.status)) && (
+
+                    {/* PHASE 2: Confirm passenger boarded — requires OTP from passenger */}
+                    {(['started', 'in-progress'].includes(ride.status) || enRouteRides.has(ride.rideID)) && (
                       <Button
-                        size="small"
-                        variant="text"
-                        color="info"
-                        startIcon={<Chat />}
-                        onClick={() => navigate(`/chat/${ride.rideID}`)}
+                        size="small" variant="contained"
+                        startIcon={<Lock />}
+                        onClick={() => handleConfirmBoarding(ride.rideID)}
+                        sx={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)', fontWeight: 700, boxShadow: '0 4px 12px rgba(139,92,246,0.35)', '&:hover': { transform: 'scale(1.03)' } }}
                       >
+                        🔐 Confirm Boarding (OTP)
+                      </Button>
+                    )}
+
+                    {/* Chat — visible when ride is active */}
+                    {(['in-progress', 'started'].includes(ride.status)) && (
+                      <Button size="small" variant="text" color="info" startIcon={<Chat />} onClick={() => navigate(`/chat/${ride.rideID}`)}>
                         Chat
                       </Button>
                     )}
-                    {/* Navigate / Live Share button */}
+
+                    {/* Navigate */}
                     {(['in-progress', 'started'].includes(ride.status)) && (
-                      <Button
-                        size="small"
-                        variant="contained"
-                        startIcon={<GpsFixed />}
-                        onClick={() => navigate(/live/)}
-                        sx={{ background: 'linear-gradient(135deg, #059669, #0891B2)', fontWeight: 700 }}
-                      >
+                      <Button size="small" variant="contained" startIcon={<GpsFixed />} onClick={() => navigate(`/live/${ride.rideID}`)}
+                        sx={{ background: 'linear-gradient(135deg, #059669, #0891B2)', fontWeight: 700 }}>
                         Navigate
                       </Button>
                     )}
-                    {/* End button - shown when ride is in progress */}
+
+                    {/* End ride */}
                     {(['in-progress', 'started'].includes(ride.status)) && (
-                      <Button
-                        size="small"
-                        variant="contained"
-                        color="warning"
-                        startIcon={<Stop />}
+                      <Button size="small" variant="contained" color="warning" startIcon={<Stop />}
                         disabled={actionLoading[ride.rideID] === 'end'}
-                        onClick={() => handleRideAction(ride.rideID, 'end')}
-                      >
+                        onClick={() => handleRideAction(ride.rideID, 'end')}>
                         {actionLoading[ride.rideID] === 'end' ? 'Ending...' : 'End Ride'}
                       </Button>
                     )}
-                    {/* Cancel button ? shown when not already done */}
+
+                    {/* Cancel */}
                     {!(['completed', 'cancelled'].includes(ride.status)) && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        startIcon={<Cancel />}
+                      <Button size="small" variant="outlined" color="error" startIcon={<Cancel />}
                         disabled={actionLoading[ride.rideID] === 'cancel'}
-                        onClick={() => handleRideAction(ride.rideID, 'cancel')}
-                      >
+                        onClick={() => handleRideAction(ride.rideID, 'cancel')}>
                         {actionLoading[ride.rideID] === 'cancel' ? 'Cancelling...' : 'Cancel'}
                       </Button>
                     )}

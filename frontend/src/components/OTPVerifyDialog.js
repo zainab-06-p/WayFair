@@ -82,7 +82,7 @@ export default function OTPVerifyDialog({ open, onClose, rideID, bookingID, onVe
       });
 
       setSuccess(true);
-      enqueueSnackbar('🚗 OTP verified! Ride has started.', { variant: 'success', autoHideDuration: 4000 });
+      enqueueSnackbar('Passenger confirmed on board! Payment is now enabled.', { variant: 'success', autoHideDuration: 4000 });
 
       setTimeout(() => {
         onVerified?.(res.data);
@@ -145,12 +145,12 @@ export default function OTPVerifyDialog({ open, onClose, rideID, bookingID, onVe
           )}
         </Box>
         <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
-          {success ? 'OTP Verified! 🎉' : 'Enter Passenger OTP'}
+          {success ? 'Passenger Boarded! 🎉' : 'Confirm Passenger Boarding'}
         </Typography>
         <Typography variant="body2" sx={{ color: '#475569', mt: 0.5, fontWeight: 400 }}>
           {success
-            ? 'Ride has started successfully!'
-            : 'Ask your passenger to share their 6-digit ride OTP'}
+            ? 'Passenger is on board. Payment is now enabled!'
+            : 'Ask the passenger to share their 6-digit OTP when they board'}
         </Typography>
       </DialogTitle>
 
@@ -226,14 +226,13 @@ export default function OTPVerifyDialog({ open, onClose, rideID, bookingID, onVe
 
               <Box sx={{ textAlign: 'center', mt: 1 }}>
                 <Chip
-                  label="🔐 OTP is given by the passenger at the pickup point"
+                  label="Ask the passenger for their OTP when they board your vehicle"
                   size="small"
                   sx={{
                     background: 'rgba(139,92,246,0.08)',
                     color: '#7C3AED',
                     border: '1px solid rgba(139,92,246,0.2)',
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
+                    fontSize: '0.72rem', fontWeight: 600,
                   }}
                 />
               </Box>
@@ -268,7 +267,7 @@ export default function OTPVerifyDialog({ open, onClose, rideID, bookingID, onVe
                 fontSize: '1rem',
               }}
             >
-              {loading ? <CircularProgress size={22} color="inherit" /> : '🚗 Start Ride'}
+              {loading ? <CircularProgress size={22} color="inherit" /> : '🔐 Confirm Boarding'}
             </Button>
           </>
         )}
