@@ -6,6 +6,10 @@ const fabricClient = require('../utils/fabricClient');
 const cryptoUtil = require('../utils/crypto');
 const emailService = require('../utils/emailService');
 
+// global.rideOTPs is initialized in bookings.js (loaded first)
+// but guard here in case routes load in different order
+global.rideOTPs = global.rideOTPs || new Map();
+
 // Create a new ride (driver only)
 router.post('/create', authenticateToken, async (req, res) => {
   try {
@@ -198,7 +202,92 @@ router.post('/book', authenticateToken, async (req, res) => {
   }
 });
 
-// Start a ride
+// Verify OTP and start ride (driver enters OTP given by passenger)
+router.post('/verify-otp', authenticateToken, async (req, res) => {
+  try {
+    const { rideID, bookingID, otp } = req.body;
+
+    if (!rideID || !bookingID || !otp) {
+      return res.status(400).json({ error: 'rideID, bookingID, and otp are required' });
+    }
+
+    const otpRecord = global.rideOTPs.get(bookingID);
+    if (!otpRecord) {
+      return res.status(404).json({ error: 'OTP not found for this booking. Ask passenger to refresh.' });
+    }
+
+    if (otpRecord.used) {
+      return res.status(400).json({ error: 'OTP already used — ride is already started.' });
+    }
+
+    if (new Date(otpRecord.expiresAt) < new Date()) {
+      global.rideOTPs.delete(bookingID);
+      return res.status(400).json({ error: 'OTP expired. Please cancel and rebook.' });
+    }
+
+    if (otpRecord.otp !== otp.trim()) {
+      return res.status(401).json({ error: 'Incorrect OTP. Please ask the passenger to read their OTP again.' });
+    }
+
+    // Mark OTP as used
+    otpRecord.used = true;
+    otpRecord.usedAt = new Date().toISOString();
+    global.rideOTPs.set(bookingID, otpRecord);
+
+    // Start the ride on blockchain
+    await fabricHelper.submitTransaction('StartRide', rideID);
+
+    // Get ride details for socket notification
+    let ride = null;
+    try {
+      const rideJSON = await fabricHelper.evaluateTransaction('GetRide', rideID);
+      ride = JSON.parse(rideJSON);
+    } catch (_) {}
+
+    // Emit real-time socket events
+    const io = req.app.get('io');
+    const startPayload = {
+      rideID,
+      bookingID,
+      message: '🚗 Ride has started! OTP verified successfully.',
+      timestamp: new Date().toISOString(),
+    };
+    io.emit('ride_started', startPayload);
+    io.to(`ride_${rideID}`).emit('otp_verified', startPayload);
+    // Also notify the passenger's personal room
+    if (otpRecord.passengerID) {
+      io.to(otpRecord.passengerID).emit('otp_verified', startPayload);
+    }
+
+    // Notify passengers via email (best-effort)
+    try {
+      if (ride?.passengers?.length) {
+        for (const pID of ride.passengers) {
+          const pJSON = await fabricHelper.evaluateTransaction('GetUser', pID);
+          const p = JSON.parse(pJSON);
+          if (p?.email) {
+            await emailService.sendRideNotification(p.email, 'RIDE_STARTED', {
+              rideID,
+              startLocation: ride.startLocation?.address || ride.startAddress,
+              endLocation: ride.endLocation?.address || ride.endAddress,
+            });
+          }
+        }
+      }
+    } catch (_) {}
+
+    res.json({
+      message: 'OTP verified! Ride started successfully.',
+      rideID,
+      bookingID,
+    });
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.status(500).json({ error: error.message || 'Failed to verify OTP' });
+  }
+});
+
+// Start a ride (legacy — kept for backward compat, but use /verify-otp instead)
 router.post('/start', authenticateToken, async (req, res) => {
   try {
     const { rideID, driverID } = req.body;
@@ -255,12 +344,19 @@ router.post('/end', authenticateToken, async (req, res) => {
     const rideJSON = await fabricHelper.evaluateTransaction('GetRide', rideID);
     const ride = JSON.parse(rideJSON);
 
-    // Record payment transactions for all non-cancelled bookings
+    // ── Auto-release escrow payments for all bookings ────────────────
+    const paymentRoutes = require('./payment');
+    const releasePaymentForBooking = paymentRoutes.releasePaymentForBooking;
+    let releaseResults = [];
+
     try {
       const bookingsJSON = await fabricHelper.evaluateTransaction('GetRideBookings', rideID);
       const rideBookings = JSON.parse(bookingsJSON || '[]');
+
       for (const booking of rideBookings) {
         if (booking.status === 'cancelled') continue;
+
+        // Auto-record transaction if not already present
         const amount = (booking.seatsBooked || 1) * (ride.pricePerSeat || 0);
         const txnID = cryptoUtil.generateUniqueID('TXN_');
         await fabricHelper.submitTransaction(
@@ -274,30 +370,43 @@ router.post('/end', authenticateToken, async (req, res) => {
           booking.paymentMethod || 'cash',
           ''
         );
+
+        // Release escrow payment
+        if (releasePaymentForBooking) {
+          const result = await releasePaymentForBooking(booking.bookingID);
+          releaseResults.push({ bookingID: booking.bookingID, ...result });
+          console.log(`💸 Payment release for ${booking.bookingID}:`, result);
+        }
       }
     } catch (payErr) {
-      console.warn('Payment recording error (non-critical):', payErr.message);
+      console.warn('Payment release error (non-critical):', payErr.message);
     }
 
     // Notify all passengers
-    for (const passengerID of ride.passengers) {
-      const passengerJSON = await fabricHelper.evaluateTransaction('GetUser', passengerID);
-      const passenger = JSON.parse(passengerJSON);
-      
-      await emailService.sendRideNotification(passenger.email, 'RIDE_COMPLETED', {
-        rideID,
-        startLocation: ride.startLocation.address,
-        endLocation: ride.endLocation.address
-      });
+    for (const passengerID of (ride.passengers || [])) {
+      try {
+        const passengerJSON = await fabricHelper.evaluateTransaction('GetUser', passengerID);
+        const passenger = JSON.parse(passengerJSON);
+        if (passenger?.email) {
+          await emailService.sendRideNotification(passenger.email, 'RIDE_COMPLETED', {
+            rideID,
+            startLocation: ride.startLocation?.address || ride.startAddress,
+            endLocation: ride.endLocation?.address || ride.endAddress
+          });
+        }
+      } catch (_) {}
     }
 
     // Emit socket event
     const io = req.app.get('io');
     io.emit('ride_completed', { rideID });
+    io.emit('ride_ended', { rideID, payments: releaseResults });
 
     res.json({
       message: 'Ride completed successfully',
-      rideID
+      rideID,
+      paymentsReleased: releaseResults.length,
+      paymentDetails: releaseResults,
     });
 
   } catch (error) {
@@ -305,6 +414,7 @@ router.post('/end', authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message || 'Failed to end ride' });
   }
 });
+
 
 // Cancel a ride
 router.post('/cancel', authenticateToken, async (req, res) => {

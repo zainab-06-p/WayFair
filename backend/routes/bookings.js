@@ -4,6 +4,14 @@ const { authenticateToken } = require('./auth');
 const fabricHelper = require('../utils/fabricHelper');
 const cryptoUtil = require('../utils/crypto');
 
+// ─── OTP Store ──────────────────────────────────────────────────────────────
+// global.rideOTPs: bookingID → { otp, rideID, passengerID, expiresAt, used }
+global.rideOTPs = global.rideOTPs || new Map();
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 // ── specific routes first (before wildcard /:bookingID) ──────────
 
 // Get current user's bookings
@@ -73,11 +81,52 @@ router.post('/create', authenticateToken, async (req, res) => {
       paymentMethod || 'cash',
     );
 
-    res.status(201).json({ message: 'Ride booked successfully', bookingID });
+    // ── Generate OTP for this booking ─────────────────────────────────────
+    const otp = generateOTP();
+    global.rideOTPs.set(bookingID, {
+      otp,
+      rideID,
+      passengerID: passengerID,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24h expiry
+      used: false,
+      createdAt: new Date().toISOString(),
+    });
+    console.log(`🔐 OTP generated for booking ${bookingID}: ${otp}`);
+
+    res.status(201).json({ message: 'Ride booked successfully', bookingID, otp });
   } catch (error) {
     console.error('Create booking error:', error);
     res.status(500).json({ error: error.message || 'Failed to book ride' });
   }
+});
+
+// ─── GET /otp/:bookingID — Passenger fetches their OTP ─────────────────────
+router.get('/otp/:bookingID', authenticateToken, (req, res) => {
+  const { bookingID } = req.params;
+  const { userID, walletAddress } = req.user;
+  const otpRecord = global.rideOTPs.get(bookingID);
+
+  if (!otpRecord) {
+    return res.status(404).json({ error: 'OTP not found for this booking' });
+  }
+
+  // Verify the requester is the passenger
+  const requesterID = userID || walletAddress;
+  if (otpRecord.passengerID !== requesterID) {
+    return res.status(403).json({ error: 'Forbidden — not your booking' });
+  }
+
+  if (otpRecord.used) {
+    return res.json({ otp: null, used: true, message: 'OTP has already been used — ride started' });
+  }
+
+  res.json({
+    otp: otpRecord.otp,
+    bookingID,
+    rideID: otpRecord.rideID,
+    used: false,
+    expiresAt: otpRecord.expiresAt,
+  });
 });
 
 // Cancel a booking

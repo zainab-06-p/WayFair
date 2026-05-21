@@ -36,10 +36,12 @@ module.exports = (io) => {
     // Store connection
     activeConnections.set(socket.user.pseudoID, socket.id);
 
-    // Join user to their personal room
+    // Join user to their personal rooms (for direct notifications)
     socket.join(socket.user.pseudoID);
+    if (socket.user.userID) socket.join(socket.user.userID);
+    if (socket.user.walletAddress) socket.join(socket.user.walletAddress);
 
-    // Handle joining ride chat room
+    // ─── Ride Chat ─────────────────────────────────────────────────────────
     socket.on('join_ride_chat', ({ rideID, userID }) => {
       socket.join(`ride_${rideID}`);
       
@@ -61,7 +63,6 @@ module.exports = (io) => {
       console.log(`User ${userID} joined ride chat: ${rideID}`);
     });
 
-    // Handle leaving ride chat room
     socket.on('leave_ride_chat', ({ rideID, userID }) => {
       socket.leave(`ride_${rideID}`);
       
@@ -81,7 +82,6 @@ module.exports = (io) => {
       console.log(`User ${userID} left ride chat: ${rideID}`);
     });
 
-    // Handle sending messages
     socket.on('send_message', ({ rideID, message, senderID, senderRole }) => {
       const messageData = {
         messageID: `MSG_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -99,13 +99,12 @@ module.exports = (io) => {
       history.push(messageData);
       if (history.length > 100) history.shift();
 
-      // Broadcast to all users in the ride chat room (including sender)
+      // Broadcast to all in the ride chat room
       io.to(`ride_${rideID}`).emit('new_message', messageData);
 
       console.log(`Message sent in ride ${rideID} by ${senderID}`);
     });
 
-    // Handle typing indicator
     socket.on('typing', ({ rideID, userID, isTyping }) => {
       socket.to(`ride_${rideID}`).emit('user_typing', {
         userID,
@@ -114,21 +113,85 @@ module.exports = (io) => {
       });
     });
 
-    // Handle ride location updates (for real-time tracking)
+    // ─── Live Driver Tracking ───────────────────────────────────────────────
+    socket.on('driver:share_location', ({ rideID, location, heading, speed }) => {
+      const locationData = {
+        rideID,
+        driverID: socket.user.userID || socket.user.pseudoID,
+        location: {
+          lat: location.lat,
+          lng: location.lng,
+          accuracy: location.accuracy || 0,
+        },
+        heading: heading || 0,
+        speed: speed || 0,
+        timestamp: new Date().toISOString(),
+      };
+
+      socket.to(`ride_${rideID}`).emit('driver:location_update', locationData);
+      socket.to(`tracking_${rideID}`).emit('driver:location_update', locationData);
+    });
+
+    socket.on('passenger:track_ride', ({ rideID }) => {
+      socket.join(`tracking_${rideID}`);
+      socket.join(`ride_${rideID}`);
+      console.log(`Passenger ${socket.user.pseudoID} tracking ride ${rideID}`);
+    });
+
+    socket.on('driver:start_sharing', ({ rideID }) => {
+      socket.join(`ride_${rideID}`);
+      socket.join(`tracking_${rideID}`);
+      socket.to(`ride_${rideID}`).emit('driver:online', {
+        rideID,
+        driverID: socket.user.userID || socket.user.pseudoID,
+        timestamp: new Date().toISOString(),
+      });
+      console.log(`Driver ${socket.user.pseudoID} started sharing location for ride ${rideID}`);
+    });
+
+    socket.on('driver:stop_sharing', ({ rideID }) => {
+      socket.to(`ride_${rideID}`).emit('driver:offline', {
+        rideID,
+        driverID: socket.user.userID || socket.user.pseudoID,
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    // ─── OTP Events ─────────────────────────────────────────────────────────
+    // Driver joins ride room to receive OTP-related events
+    socket.on('driver:join_ride', ({ rideID }) => {
+      socket.join(`ride_${rideID}`);
+      console.log(`Driver ${socket.user.pseudoID} joined ride room: ${rideID}`);
+    });
+
+    // Passenger joins ride room to receive otp_verified events
+    socket.on('passenger:join_ride', ({ rideID }) => {
+      socket.join(`ride_${rideID}`);
+      console.log(`Passenger ${socket.user.pseudoID} joined ride room: ${rideID}`);
+    });
+
+    // ─── Referral Notifications ──────────────────────────────────────────────
+    socket.on('referral:subscribe', ({ userID }) => {
+      if (userID) {
+        socket.join(userID);
+        console.log(`User ${socket.user.pseudoID} subscribed to referral notifications`);
+      }
+    });
+
+    // Legacy location update
     socket.on('update_location', ({ rideID, location }) => {
       socket.to(`ride_${rideID}`).emit('location_update', {
         rideID,
         location,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
-    // Handle disconnection
+    // ─── Disconnect ──────────────────────────────────────────────────────────
     socket.on('disconnect', () => {
       console.log(`❌ User disconnected: ${socket.user.pseudoID}`);
       activeConnections.delete(socket.user.pseudoID);
 
-      // Remove from all chat rooms
       chatRooms.forEach((users, rideID) => {
         if (users.has(socket.user.pseudoID)) {
           users.delete(socket.user.pseudoID);
@@ -140,7 +203,6 @@ module.exports = (io) => {
       });
     });
 
-    // Handle errors
     socket.on('error', (error) => {
       console.error('Socket error:', error);
     });

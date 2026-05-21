@@ -21,7 +21,7 @@ router.post('/trigger', authenticateToken, async (req, res) => {
 
     const alertID = cryptoUtil.generateUniqueID('SOS_');
 
-    // Get passenger and driver info first
+    // Get passenger, driver and ride info first
     let passenger = null, ride = null, driver = null;
     try {
       const passengerJSON = await fabricHelper.evaluateTransaction('GetUser', passengerID);
@@ -32,7 +32,7 @@ router.post('/trigger', authenticateToken, async (req, res) => {
         const driverJSON = await fabricHelper.evaluateTransaction('GetUser', ride.driverID);
         driver = JSON.parse(driverJSON);
       }
-    } catch (_) { /* non-critical - SOS still fires */ }
+    } catch (_) { /* non-critical — SOS still fires */ }
 
     // Record SOS on blockchain
     await fabricHelper.submitTransaction(
@@ -47,15 +47,24 @@ router.post('/trigger', authenticateToken, async (req, res) => {
       location.address || ''
     );
 
-    // Send SOS alerts
+    // Build alert details
     const alertDetails = {
       alertID,
       rideID,
       bookingID,
       passengerID,
+      passengerName: passenger?.name || passenger?.email || passengerID,
+      passengerEmail: passenger?.email || '',
       location: location.address,
       latitude: location.latitude,
       longitude: location.longitude,
+      googleMapsLink: `https://maps.google.com/?q=${location.latitude},${location.longitude}`,
+      driverName: driver?.name || 'Unknown Driver',
+      driverID: ride?.driverID || '',
+      vehicleInfo: driver?.vehicleInfo || driver?.vehicle || '',
+      licensePlate: driver?.licensePlate || driver?.vehicleNumber || '',
+      rideFrom: ride?.startLocation?.address || ride?.startAddress || '',
+      rideTo: ride?.endLocation?.address || ride?.endAddress || '',
       timestamp: new Date().toISOString()
     };
 
@@ -69,16 +78,28 @@ router.post('/trigger', authenticateToken, async (req, res) => {
       if (driver?.email) await emailService.sendSOSAlert(driver.email, alertDetails);
     } catch (_) { /* email non-critical */ }
 
-    // Notify emergency contacts / authorities (via n8n)
-    // This would typically go to a monitoring system or emergency services
+    // ── NOTIFY EMERGENCY CONTACT ─────────────────────────────────────────────
+    try {
+      const emergencyContact = passenger?.emergencyContact;
+      if (emergencyContact?.email || emergencyContact?.phone) {
+        await emailService.sendEmergencyContactAlert(emergencyContact, alertDetails);
+        console.log(`🆘 Emergency contact alert sent to: ${emergencyContact.name} (${emergencyContact.email || emergencyContact.phone})`);
+      } else {
+        console.log('ℹ️  No emergency contact on file for passenger', passengerID);
+      }
+    } catch (ecErr) {
+      console.warn('Emergency contact alert failed (non-critical):', ecErr.message);
+    }
 
-    // Emit real-time socket event
+    // Emit real-time socket events
     const io = req.app.get('io');
     io.emit('sos_alert', alertDetails);
-    io.to(ride.driverID).emit('sos_alert', alertDetails);
+    if (ride?.driverID) {
+      io.to(ride.driverID).emit('sos_alert', alertDetails);
+    }
 
     res.status(201).json({
-      message: 'SOS alert triggered. Authorities have been notified.',
+      message: 'SOS alert triggered. Emergency contact and authorities have been notified.',
       alertID,
       alertDetails
     });
@@ -118,18 +139,11 @@ router.get('/', authenticateToken, async (req, res) => {
 router.post('/resolve', authenticateToken, async (req, res) => {
   try {
     const { alertID } = req.body;
-
     if (!alertID) {
       return res.status(400).json({ error: 'Missing alertID' });
     }
-
     await fabricHelper.submitTransaction('ResolveSOSAlert', alertID);
-
-    res.json({
-      message: 'SOS alert resolved successfully',
-      alertID
-    });
-
+    res.json({ message: 'SOS alert resolved successfully', alertID });
   } catch (error) {
     console.error('Resolve SOS error:', error);
     res.status(500).json({ error: 'Failed to resolve SOS alert' });

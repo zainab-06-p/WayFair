@@ -19,6 +19,7 @@ const explorerRoutes = require('./routes/explorer');
 const usersRoutes = require('./routes/users');
 const sponsorshipRoutes = require('./routes/sponsorship');
 const referralRoutes = require('./routes/referral');
+const routingRoutes = require('./routes/routing');
 const chatHandler = require('./sockets/chat');
 
 const app = express();
@@ -59,6 +60,7 @@ app.use('/api/explorer', explorerRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/sponsorship', sponsorshipRoutes);
 app.use('/api/referral', referralRoutes);
+app.use('/api/routing', routingRoutes);
 
 // WebSocket for real-time chat
 chatHandler(io);

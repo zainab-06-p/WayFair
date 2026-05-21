@@ -101,7 +101,7 @@ function handleLocalStorage(functionName, ...args) {
   
   switch (functionName) {
     case 'RegisterUser': {
-      const [userID, pseudoID, role, email, ipfsHash] = args;
+      const [userID, pseudoID, role, email, ipfsHash, emergencyContactJSON] = args;
       global.users = global.users || new Map();
       global.users.set(userID, {
         userID,
@@ -111,6 +111,7 @@ function handleLocalStorage(functionName, ...args) {
         ipfsHash,
         emailVerified: true,
         isActive: true,
+        emergencyContact: emergencyContactJSON ? (() => { try { return JSON.parse(emergencyContactJSON); } catch(_) { return null; } })() : null,
         createdAt: new Date().toISOString()
       });
       persistLocalData();
@@ -118,7 +119,7 @@ function handleLocalStorage(functionName, ...args) {
     }
 
     case 'RegisterWalletUser': {
-      const [userID, walletAddress, role, email, ipfsHash] = args;
+      const [userID, walletAddress, role, email, ipfsHash, emergencyContactJSON] = args;
       global.walletUsers = global.walletUsers || new Map();
       const walletUser = {
         userID,
@@ -129,6 +130,7 @@ function handleLocalStorage(functionName, ...args) {
         emailVerified: true,
         isActive: true,
         isBlocked: false,
+        emergencyContact: emergencyContactJSON ? (() => { try { return JSON.parse(emergencyContactJSON); } catch(_) { return null; } })() : null,
         createdAt: new Date().toISOString()
       };
       global.walletUsers.set(walletAddress.toLowerCase(), walletUser);

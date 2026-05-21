@@ -117,4 +117,127 @@ router.get('/stats', authenticateToken, async (req, res) => {
   }
 });
 
+// ─── Get any user's wallet address by userID (for ETH payments) ──────────────
+// Returns only wallet address — safe to expose to authenticated users
+router.get('/:userID/wallet', authenticateToken, async (req, res) => {
+  try {
+    const { userID } = req.params;
+    if (!userID) return res.status(400).json({ error: 'userID required' });
+
+    let user = null;
+
+    // Try GetUser first (standard users)
+    try {
+      const j = await fabricHelper.evaluateTransaction('GetUser', userID);
+      user = j && j !== 'null' ? JSON.parse(j) : null;
+    } catch (_) {}
+
+    // If not found, try GetUserByWallet (MetaMask users whose userID IS their wallet)
+    if (!user && userID.startsWith('0x')) {
+      try {
+        const j = await fabricHelper.evaluateTransaction('GetUserByWallet', userID);
+        user = j && j !== 'null' ? JSON.parse(j) : null;
+      } catch (_) {}
+    }
+
+    // Also try by pseudoID
+    if (!user) {
+      try {
+        const j = await fabricHelper.evaluateTransaction('GetUserByPseudoID', userID);
+        user = j && j !== 'null' ? JSON.parse(j) : null;
+      } catch (_) {}
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found', walletAddress: null });
+    }
+
+    const wallet = user.walletAddress || (userID.startsWith('0x') ? userID : null);
+
+    res.json({
+      userID:        user.userID,
+      walletAddress: wallet,
+      hasWallet:     !!wallet,
+    });
+  } catch (error) {
+    console.error('Get user wallet error:', error);
+    res.status(500).json({ error: 'Failed to fetch wallet address', walletAddress: null });
+  }
+});
+
+// ─── Get any user's public profile (name, pic, vehicle) ──────────────────────
+router.get('/:userID/public', authenticateToken, async (req, res) => {
+  try {
+    const { userID } = req.params;
+    if (!userID) return res.status(400).json({ error: 'userID required' });
+
+    let user = null;
+
+    // Try GetUser first
+    try {
+      const j = await fabricHelper.evaluateTransaction('GetUser', userID);
+      user = j && j !== 'null' ? JSON.parse(j) : null;
+    } catch (_) {}
+
+    // Try wallet
+    if (!user && userID.startsWith('0x')) {
+      try {
+        const j = await fabricHelper.evaluateTransaction('GetUserByWallet', userID);
+        user = j && j !== 'null' ? JSON.parse(j) : null;
+      } catch (_) {}
+    }
+
+    // Try pseudoID
+    if (!user) {
+      try {
+        const j = await fabricHelper.evaluateTransaction('GetUserByPseudoID', userID);
+        user = j && j !== 'null' ? JSON.parse(j) : null;
+      } catch (_) {}
+    }
+
+    // Also check in-memory stores
+    if (!user && global.users) {
+      user = global.users.get(userID) || null;
+    }
+    if (!user && global.walletUsers) {
+      user = global.walletUsers.get(userID) || null;
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Build public profile
+    const publicProfile = {
+      userID: user.userID,
+      role: user.role,
+      name: user.name || null,
+      profilePic: user.profilePic || null,
+      // vehicle info
+      vehicleInfo: user.vehicleInfo || user.vehicle || null,
+      licensePlate: user.licensePlate || user.vehicleNumber || null,
+      vehicleModel: user.vehicleModel || null,
+      vehicleColor: user.vehicleColor || null,
+    };
+
+    // Enrich from IPFS if available
+    if (user.ipfsHash) {
+      try {
+        const ipfsData = await ipfsClient.getJSON(user.ipfsHash);
+        publicProfile.name = publicProfile.name || ipfsData.name || null;
+        publicProfile.profilePic = publicProfile.profilePic || ipfsData.documents?.profilePic || null;
+        publicProfile.vehicleInfo = publicProfile.vehicleInfo || ipfsData.vehicleInfo || ipfsData.vehicle || null;
+        publicProfile.licensePlate = publicProfile.licensePlate || ipfsData.licensePlate || ipfsData.vehicleNumber || null;
+        publicProfile.vehicleModel = publicProfile.vehicleModel || ipfsData.vehicleModel || null;
+        publicProfile.vehicleColor = publicProfile.vehicleColor || ipfsData.vehicleColor || null;
+      } catch (_) {}
+    }
+
+    res.json(publicProfile);
+  } catch (error) {
+    console.error('Public profile error:', error);
+    res.status(500).json({ error: 'Failed to fetch public profile' });
+  }
+});
+
 module.exports = router;
