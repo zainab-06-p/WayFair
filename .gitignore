@@ -1,37 +1,52 @@
+# Dependencies
 node_modules/
-.env
-.env.local
-dist/
-build/
+*/node_modules/
+
+# Environment variables (NEVER commit these)
+backend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Build outputs
+frontend/build/
+frontend/.cache/
+
+# Logs
 *.log
+backend/server.log
+backend/startup.log
+backend/startup-err.log
+backend/test-output.txt
 
-# Hyperledger Fabric
-network/organizations/
+# Local data stores (regenerated at runtime)
+backend/local-data.json
+backend/local-payments.json
+backend/local-referrals.json
+
+# Wallet files (sensitive crypto material)
+backend/wallet/
+network/organizations/peerOrganizations/
+network/organizations/ordererOrganizations/
 network/channel-artifacts/
-network/system-genesis-block/
-wallet/
-*.tar.gz
-*.exe
-*.tgz
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Compiled chaincode binary
+chaincode/rideshare-chaincode.exe
+chaincode/rideshare-chaincode
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Keys
-*.pem
-*.key
-private/
+# Editor
+.vscode/settings.json
+*.swp
 
-# Markdown docs (except README)
-CURRENT_STATUS.md
-FEATURES_IMPLEMENTATION.md
-PROJECT_COMPARISON.md
-REFERRAL_SYSTEM_GUIDE.md
-docs/
+# Test files
+backend/test-quick.js
+backend/test-fabric-check.js
+
+# Uploads (user files — should be on IPFS)
+backend/uploads/*
+!backend/uploads/.gitkeep
