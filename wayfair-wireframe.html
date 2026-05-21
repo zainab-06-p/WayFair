@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WayFair Wireframe</title>
+  <style>
+    :root {
+      --bg: #0b1022;
+      --text: #f8fafc;
+      --muted: #c7d2fe;
+      --cyan: #39d0ff;
+      --violet: #7b6cff;
+      --pink: #f36adf;
+      --card: rgba(20, 25, 48, 0.72);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 20px 50px rgba(5, 10, 30, 0.55);
+      --radius: 18px;
+      --gap: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Montserrat", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 35% 20%, rgba(57, 208, 255, 0.2), transparent 60%),
+                  radial-gradient(900px 700px at 70% 30%, rgba(243, 106, 223, 0.2), transparent 55%),
+                  linear-gradient(135deg, #0b1022 0%, #1a1240 50%, #2a0f3a 100%);
+    }
+
+    .frame {
+      width: 1200px;
+      min-height: 760px;
+      margin: 32px auto;
+      padding: 28px;
+      background: rgba(10, 15, 32, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .frame-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      color: #e2e8f0;
+      letter-spacing: 0.2px;
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .row { display: flex; gap: var(--gap); }
+    .col { display: flex; flex-direction: column; gap: var(--gap); }
+    .spacer { height: 8px; }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      color: #0b1022;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .btn.secondary {
+      background: rgba(15, 23, 42, 0.6);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(57, 208, 255, 0.18);
+      color: #c7f9ff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .input {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(12, 18, 38, 0.85);
+      color: #e2e8f0;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+    .two-col { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--gap); }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+    .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .map {
+      height: 320px;
+      border-radius: var(--radius);
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      background: radial-gradient(400px 200px at 30% 40%, rgba(57, 208, 255, 0.2), transparent 60%),
+                  radial-gradient(420px 240px at 70% 50%, rgba(243, 106, 223, 0.2), transparent 60%),
+                  linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(139, 92, 246, 0.08), rgba(236, 72, 153, 0.08));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5f5;
+      font-weight: 600;
+    }
+
+    .hero {
+      padding: 28px;
+      border-radius: 24px;
+      background: radial-gradient(600px 260px at 20% 20%, rgba(57, 208, 255, 0.2), transparent 70%),
+                  radial-gradient(600px 260px at 80% 30%, rgba(243, 106, 223, 0.2), transparent 70%),
+                  linear-gradient(120deg, rgba(57, 208, 255, 0.12), rgba(123, 108, 255, 0.12), rgba(243, 106, 223, 0.12));
+    }
+
+    .footer { display: flex; gap: 24px; color: #b7c2ff; font-size: 12px; }
+
+    .tab-bar { display: flex; gap: 10px; }
+    .tab { padding: 6px 12px; border-radius: 999px; background: rgba(15, 23, 42, 0.6); font-weight: 600; font-size: 12px; color: #e2e8f0; }
+
+    .sos { background: #ef4444; color: #fff; padding: 10px 14px; border-radius: 999px; font-weight: 700; box-shadow: 0 12px 24px rgba(239, 68, 68, 0.35); }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0 20px 0;
+    }
+
+    .nav-links { display: flex; gap: 18px; align-items: center; color: #cbd5f5; }
+    .nav-pill { padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+
+    .headline {
+      font-size: 48px;
+      line-height: 1.05;
+      font-weight: 800;
+      margin: 10px 0 8px 0;
+      letter-spacing: 0.2px;
+    }
+
+    .subhead { color: #cbd5f5; font-size: 16px; max-width: 560px; }
+  </style>
+</head>
+<body>
+  <!-- Frame 1: Home -->
+  <section class="frame" data-frame="Home">
+    <h1 class="frame-title">WayFair - Home</h1>
+    <div class="nav">
+      <div class="row" style="align-items:center; gap:12px;">
+        <div class="glass" style="width:36px; height:36px; border-radius:50%;"></div>
+        <div class="brand">WayFair</div>
+      </div>
+      <div class="nav-links">
+        <div>Explorer</div>
+        <div>Login</div>
+        <div class="nav-pill">Get Started</div>
+      </div>
+    </div>
+    <div class="hero">
+      <div class="row" style="align-items:center; justify-content:space-between;">
+        <div class="col" style="max-width:60%;">
+          <div class="chip">Ride-sharing built for trust</div>
+          <h2 class="headline">Blockchain Ridesharing Reimagined</h2>
+          <p class="subhead">Experience secure, transparent, and rewarding rides with real-time tracking and community trust.</p>
+          <div class="row">
+            <div class="btn">Find Your Ride</div>
+            <div class="btn secondary">Become a Driver</div>
+          </div>
+        </div>
+        <div class="glass" style="width:300px;">
+          <div class="small muted">Quick Search</div>
+          <div class="spacer"></div>
+          <div class="input">From...</div>
+          <div class="spacer"></div>
+          <div class="input">To...</div>
+          <div class="spacer"></div>
+          <div class="btn">Search</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="card-grid">
+      <div class="glass">Verified drivers and ratings</div>
+      <div class="glass">Live GPS tracking</div>
+      <div class="glass">Multiple payment options</div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="three-col">
+      <div class="glass">Step 1: Register</div>
+      <div class="glass">Step 2: Search or Create a Ride</div>
+      <div class="glass">Step 3: Track, Pay, Rate</div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="four-col">
+      <div class="glass">"Safe and easy" - Alex</div>
+      <div class="glass">"Great drivers" - Priya</div>
+      <div class="glass">"Affordable rides" - Sam</div>
+      <div class="glass">"Loved the app" - Mei</div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="footer">
+      <div>About</div><div>Careers</div><div>Support</div><div>Privacy</div>
+    </div>
+  </section>
+
+  <!-- Frame 2: Login -->
+  <section class="frame" data-frame="Login">
+    <h1 class="frame-title">Login</h1>
+    <div class="two-col">
+      <div class="glass">
+        <div class="col">
+          <div class="input">Email</div>
+          <div class="input">Password</div>
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <label class="small"><input type="checkbox" /> Admin mode</label>
+            <div class="small muted">Forgot password?</div>
+          </div>
+          <div class="btn">Login</div>
+          <div class="btn secondary">Login with MetaMask</div>
+          <div class="small">Don't have an account? Register</div>
+        </div>
+      </div>
+      <div class="glass">
+        <h3>Why WayFair?</h3>
+        <ul class="small muted">
+          <li>Role-based dashboards</li>
+          <li>Verified drivers</li>
+          <li>Live tracking and SOS</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 3: Register -->
+  <section class="frame" data-frame="Register">
+    <h1 class="frame-title">Register</h1>
+    <div class="two-col">
+      <div class="glass col">
+        <div class="input">Full Name</div>
+        <div class="row">
+          <div class="input" style="flex:1;">Age</div>
+          <div class="input" style="flex:1;">Gender</div>
+        </div>
+        <div class="input">Email</div>
+        <div class="input">Password</div>
+        <div class="row">
+          <label><input type="radio" name="role" /> Passenger</label>
+          <label><input type="radio" name="role" /> Driver</label>
+        </div>
+        <div class="glass" style="border-style:dashed;">
+          Driver Only: Upload License + Vehicle Papers
+        </div>
+        <div class="btn">Create Account</div>
+      </div>
+      <div class="glass">
+        <h3>What you get</h3>
+        <p class="small muted">Seamless bookings, transparent payments, trusted community.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 4: Passenger Dashboard -->
+  <section class="frame" data-frame="Passenger Dashboard">
+    <h1 class="frame-title">Passenger Dashboard</h1>
+    <div class="four-col">
+      <div class="glass">Total Bookings: 24</div>
+      <div class="glass">Upcoming: 3</div>
+      <div class="glass">Completed: 18</div>
+      <div class="glass">Total Spent: $420</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="row">
+      <div class="btn">Search Rides</div>
+      <div class="btn secondary">My Bookings</div>
+      <div class="btn secondary">Profile</div>
+      <div class="btn secondary">Referral</div>
+    </div>
+  </section>
+
+  <!-- Frame 5: Driver Dashboard -->
+  <section class="frame" data-frame="Driver Dashboard">
+    <h1 class="frame-title">Driver Dashboard</h1>
+    <div class="four-col">
+      <div class="glass">Total Rides: 58</div>
+      <div class="glass">Active: 2</div>
+      <div class="glass">Passengers: 132</div>
+      <div class="glass">Earnings: $1,980</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="row">
+      <div class="btn">Create New Ride</div>
+      <div class="btn secondary">My Rides</div>
+      <div class="btn secondary">Profile</div>
+      <div class="btn secondary">Referral</div>
+    </div>
+  </section>
+
+  <!-- Frame 6: Search Rides -->
+  <section class="frame" data-frame="Search Rides">
+    <h1 class="frame-title">Search Rides</h1>
+    <div class="glass col">
+      <div class="row">
+        <div class="input" style="flex:1;">From</div>
+        <div class="input" style="flex:1;">To</div>
+        <div class="input" style="width:160px;">Date</div>
+        <div class="input" style="width:140px;">Seats</div>
+        <div class="btn">Search</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="row">
+      <div class="col" style="flex:1;">
+        <div class="glass">
+          <div class="row" style="justify-content:space-between;">
+            <div>
+              <div><strong>Driver:</strong> Ana R.</div>
+              <div class="small muted">Downtown -> Airport</div>
+            </div>
+            <div class="chip">$15</div>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <div class="btn">Book Now</div>
+            <div class="btn secondary">View Details</div>
+            <div class="btn secondary">Chat</div>
+          </div>
+        </div>
+        <div class="glass">
+          <div class="row" style="justify-content:space-between;">
+            <div>
+              <div><strong>Driver:</strong> Liam K.</div>
+              <div class="small muted">City Mall -> University</div>
+            </div>
+            <div class="chip">$10</div>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <div class="btn">Book Now</div>
+            <div class="btn secondary">View Details</div>
+            <div class="btn secondary">Chat</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;">
+        <div class="map">Map Preview</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 7: Ride Details -->
+  <section class="frame" data-frame="Ride Details">
+    <h1 class="frame-title">Ride Details</h1>
+    <div class="two-col">
+      <div class="glass col">
+        <div class="map">Route Map</div>
+        <div class="row">
+          <div class="chip">Seats: 3</div>
+          <div class="chip">Departure: 08:30</div>
+          <div class="chip">Price: $12</div>
+        </div>
+        <div class="row">
+          <div class="btn">Book Ride</div>
+          <div class="btn secondary">Chat Driver</div>
+          <div class="btn secondary">Track Live</div>
+        </div>
+      </div>
+      <div class="glass col">
+        <div><strong>Driver:</strong> Ana R.</div>
+        <div class="small muted">Rating: 4.8 (120 reviews)</div>
+        <div class="glass" style="border-style:dashed;">Passenger list with Accept/Reject buttons (driver view)</div>
+        <div class="btn secondary">Rate Driver</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 8: My Bookings -->
+  <section class="frame" data-frame="My Bookings">
+    <h1 class="frame-title">My Bookings</h1>
+    <div class="col">
+      <div class="glass">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div><strong>Downtown -> Airport</strong></div>
+            <div class="small muted">Driver: Ana R. -> 08:30</div>
+          </div>
+          <div class="chip">Confirmed</div>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <div class="btn secondary">Chat</div>
+          <div class="btn secondary">Track Live</div>
+          <div class="btn secondary">Rate Driver</div>
+        </div>
+      </div>
+      <div class="glass">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div><strong>City Mall -> University</strong></div>
+            <div class="small muted">Driver: Liam K. -> 18:10</div>
+          </div>
+          <div class="chip">Pending</div>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <div class="btn">Pay Now</div>
+          <div class="btn secondary">Cancel</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 9: Create Ride -->
+  <section class="frame" data-frame="Create Ride">
+    <h1 class="frame-title">Create Ride</h1>
+    <div class="two-col">
+      <div class="glass col">
+        <div class="input">From (autocomplete)</div>
+        <div class="input">To (autocomplete)</div>
+        <div class="row">
+          <div class="input" style="flex:1;">Departure Time</div>
+          <div class="input" style="width:120px;">Seats</div>
+          <div class="input" style="width:160px;">Price / seat</div>
+        </div>
+        <div class="btn">Create Ride</div>
+      </div>
+      <div class="glass">
+        <div class="map">Route Preview Map</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 10: My Rides (Driver) -->
+  <section class="frame" data-frame="My Rides">
+    <h1 class="frame-title">My Rides (Driver)</h1>
+    <div class="tab-bar">
+      <div class="tab">Active</div>
+      <div class="tab">Completed</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="col">
+      <div class="glass">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div><strong>Downtown -> Airport</strong></div>
+            <div class="small muted">Seats: 2/4 -> 08:30</div>
+          </div>
+          <div class="chip">Active</div>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <div class="btn secondary">Accept</div>
+          <div class="btn secondary">Reject</div>
+        </div>
+      </div>
+      <div class="glass">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div><strong>City Mall -> University</strong></div>
+            <div class="small muted">Seats: 4/4 -> 18:10</div>
+          </div>
+          <div class="chip">Completed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 11: Live Ride Tracking -->
+  <section class="frame" data-frame="Live Ride">
+    <h1 class="frame-title">Live Ride Tracking</h1>
+    <div class="two-col">
+      <div class="map" style="height:420px;">Live Map with Driver Marker</div>
+      <div class="glass col">
+        <div class="chip">ETA: 12 min</div>
+        <div class="glass">Speed Gauge</div>
+        <div class="glass">Turn-by-turn directions</div>
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div class="small">Follow Driver</div>
+          <div class="btn secondary">Toggle</div>
+        </div>
+        <div class="sos">SOS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 12: Chat -->
+  <section class="frame" data-frame="Chat">
+    <h1 class="frame-title">Chat</h1>
+    <div class="glass" style="height:460px; display:flex; flex-direction:column;">
+      <div class="col" style="flex:1;">
+        <div class="glass">Driver: I'm 5 minutes away.</div>
+        <div class="glass">Passenger: Great, I'm at the gate.</div>
+        <div class="glass">Typing...</div>
+      </div>
+      <div class="row">
+        <div class="input" style="flex:1;">Type a message</div>
+        <div class="btn">Send</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 13: Profile -->
+  <section class="frame" data-frame="Profile">
+    <h1 class="frame-title">Profile</h1>
+    <div class="two-col">
+      <div class="glass col">
+        <div class="glass">Avatar</div>
+        <div><strong>Name:</strong> Jordan Lee</div>
+        <div><strong>Email:</strong> jordan@mail.com</div>
+        <div><strong>Role:</strong> Driver</div>
+        <div><strong>Wallet:</strong> 0x...E2C4</div>
+        <div class="btn secondary">Edit Profile</div>
+      </div>
+      <div class="glass col">
+        <div class="glass">Driver License (view)</div>
+        <div class="glass">Vehicle Papers (view)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 14: Referral -->
+  <section class="frame" data-frame="Referral">
+    <h1 class="frame-title">Referral</h1>
+    <div class="two-col">
+      <div class="glass col">
+        <div class="small muted">Your Referral Code</div>
+        <div class="input">WAYFAIR-8392</div>
+        <div class="row">
+          <div class="btn">Copy</div>
+          <div class="btn secondary">Share</div>
+        </div>
+      </div>
+      <div class="glass col">
+        <div class="small muted">Apply Referral Code</div>
+        <div class="row">
+          <div class="input" style="flex:1;">Enter code</div>
+          <div class="btn">Apply</div>
+        </div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="glass">
+      <div class="small muted">Referral History</div>
+      <table class="table">
+        <tr><th>Date</th><th>User</th><th>XP</th></tr>
+        <tr><td>2026-05-01</td><td>A. Patel</td><td>50</td></tr>
+        <tr><td>2026-04-27</td><td>M. Chen</td><td>50</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Frame 15: Admin Dashboard -->
+  <section class="frame" data-frame="Admin Dashboard">
+    <h1 class="frame-title">Admin Dashboard</h1>
+    <div class="four-col">
+      <div class="glass">Total Users: 1,240</div>
+      <div class="glass">Active Users: 1,102</div>
+      <div class="glass">Blocked Users: 24</div>
+      <div class="glass">Total Drivers: 380</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="glass">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div class="input" style="width:240px;">Search users</div>
+        <div class="row">
+          <div class="btn secondary">Filter: All</div>
+          <div class="btn secondary">Filter: Drivers</div>
+          <div class="btn secondary">Filter: Passengers</div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <table class="table">
+        <tr><th>User ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr>
+        <tr><td>U-108</td><td>Ana R.</td><td>ana@mail.com</td><td>Driver</td><td>Active</td><td>View Docs | Block</td></tr>
+        <tr><td>U-324</td><td>Liam K.</td><td>liam@mail.com</td><td>Passenger</td><td>Blocked</td><td>Unblock</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Frame 16: Blockchain Explorer -->
+  <section class="frame" data-frame="Blockchain Explorer">
+    <h1 class="frame-title">Blockchain Explorer</h1>
+    <div class="tab-bar">
+      <div class="tab">Stats</div>
+      <div class="tab">Rides</div>
+      <div class="tab">Transactions</div>
+      <div class="tab">Bookings</div>
+      <div class="tab">Feedback</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="glass">
+      <div class="row" style="justify-content:space-between;">
+        <div class="glass">Total Users: 1,240</div>
+        <div class="glass">Total Rides: 6,320</div>
+        <div class="glass">Total Bookings: 15,890</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="input">Search in tab</div>
+      <div class="spacer"></div>
+      <table class="table">
+         <tr><th>ID</th><th>User</th><th>Details</th><th>Timestamp</th><th>Status</th></tr>
+         <tr><td>R-9221</td><td>U-108</td><td>Downtown -> Airport</td><td>2026-05-02</td><td>Confirmed</td></tr>
+         <tr><td>T-5531</td><td>U-324</td><td>UPI Payment</td><td>2026-05-02</td><td>Success</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Frame 17: Modals (Booking + Payment + Feedback + SOS) -->
+  <section class="frame" data-frame="Dialogs">
+    <h1 class="frame-title">Dialogs</h1>
+    <div class="three-col">
+      <div class="glass col">
+        <div class="small muted">Booking Dialog</div>
+          <div class="small">Ride: Downtown -> Airport</div>
+        <div class="row">
+          <div class="input" style="flex:1;">Seats</div>
+          <div class="input" style="flex:1;">Payment (Cash/UPI/Crypto)</div>
+        </div>
+        <div class="row">
+          <div class="btn">Confirm</div>
+          <div class="btn secondary">Cancel</div>
+        </div>
+      </div>
+      <div class="glass col">
+        <div class="small muted">Feedback Dialog</div>
+        <div class="small">Rate Driver (1-5 stars)</div>
+        <div class="input">Write feedback</div>
+        <div class="btn">Submit</div>
+      </div>
+      <div class="glass col">
+        <div class="small muted">SOS Dialog</div>
+        <div class="small">Emergency alert with location</div>
+        <div class="btn">Confirm SOS</div>
+        <div class="btn secondary">Cancel</div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

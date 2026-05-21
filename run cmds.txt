@@ -1,0 +1,121 @@
+
+Here are the exact commands to run everything, in order:
+
+---
+
+**1. Start Fabric Docker containers** (if not already running):
+```powershell
+docker start ca_org1 ca_org2 ca_orderer
+```
+If peers are also down:
+```powershell
+wsl -d Ubuntu bash -c "cd ~/fabric-samples/test-network && ./network.sh up -ca"
+```
+
+---
+
+**2a. Build & start the chaincode service** (run once per WSL session):
+```powershell
+wsl -d Ubuntu bash -c "cd /mnt/d/HF/chaincode && go build -o /tmp/rideshare-chaincode ."
+wsl -d Ubuntu bash /mnt/d/HF/scripts/check-and-start-chaincode.sh
+```
+
+---
+
+**2b. ⚠️ REQUIRED: Add Windows→WSL port proxy**
+> Open **PowerShell as Administrator** (Win+X → Terminal (Admin))
+> Do NOT run in cmd.exe — `$wslIP` won't work there.
+> WSL IP changes on each PC restart, so always re-run this.
+
+```powershell
+# In ADMINISTRATOR PowerShell (not cmd.exe):
+$wslIP = (wsl -d Ubuntu bash -c "hostname -I").Trim().Split(" ")[0]
+netsh interface portproxy delete v4tov4 listenport=9999 listenaddress=0.0.0.0
+netsh interface portproxy add v4tov4 listenport=9999 listenaddress=0.0.0.0 connectport=9999 connectaddress=$wslIP
+netsh interface portproxy show v4tov4
+# Last column should show the real IP (e.g. 172.22.x.x), NOT '$wslIP'
+```
+
+---
+
+**2. Build & start the chaincode service** (run once per WSL session):
+```powershell
+wsl -d Ubuntu bash -c "cd /mnt/d/HF/chaincode && go build -o /tmp/rideshare-chaincode ."
+wsl -d Ubuntu bash /mnt/d/HF/scripts/check-and-start-chaincode.sh
+```
+
+---
+
+**3. Start the backend:**
+```powershell
+cd d:\HF\backend
+node server.js
+```
+
+---
+
+**4. Start the frontend** (new terminal):
+```powershell
+cd d:\HF\frontend
+npm start
+```
+
+---
+
+**Quick verification** (optional, in a new terminal):
+```powershell
+Invoke-RestMethod "http://localhost:5000/api/explorer/stats" | ConvertTo-Json -Depth 3
+```
+
+---
+
+**Every time you restart your PC**, run commands **1 → 2 → 3 → 4** in order. The chaincode binary gets wiped from tmp on WSL restart so step 2 is always needed.
+
+
+
+**Stop everything, in reverse order:**
+
+---
+
+**1. Stop the frontend** (in the terminal running `npm start`):
+```
+Ctrl+C
+```
+
+---
+
+**2. Stop the backend** (in the terminal running `node server.js`):
+```
+Ctrl+C
+```
+Or kill by port:
+```powershell
+Get-NetTCPConnection -LocalPort 5000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+---
+
+**3. Stop the chaincode service in WSL:**
+```powershell
+wsl -d Ubuntu bash -c "pkill -f rideshare-chaincode"
+```
+
+---
+
+**4. Stop Fabric Docker containers:**
+
+Just CAs (keeps peers/orderer running):
+```powershell
+docker stop ca_org1 ca_org2 ca_orderer
+```
+
+Everything (peers + orderer + CAs):
+```powershell
+docker stop peer0.org1.example.com peer0.org2.example.com orderer.example.com ca_org1 ca_org2 ca_orderer
+```
+
+**Full teardown** (destroys all data — only if you want to reset completely):
+```powershell
+wsl -d Ubuntu bash -c "cd ~/fabric-samples/test-network && ./network.sh down"
+```
+> ⚠️ `network.sh down` deletes all on-chain data, wallets, and crypto material. Don't run this unless you want a full reset.
